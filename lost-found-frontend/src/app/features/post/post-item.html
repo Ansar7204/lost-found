@@ -1,0 +1,165 @@
+<div class="backdrop" (click)="close()" aria-hidden="true"></div>
+
+<form
+  class="modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="post-title"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
+  <header class="head">
+    <button type="button" class="m-cancel m-only" (click)="close()">Cancel</button>
+    <h2 id="post-title">
+      <span class="d-only">Post a found item</span><span class="m-only">Post found item</span>
+    </h2>
+    <button type="button" class="x" aria-label="Close" (click)="close()">×</button>
+  </header>
+
+  <div class="body">
+    <div class="fields">
+      <!-- Photos -->
+      <div class="photos">
+        @if (photos().length < maxPhotos) {
+          <label class="add-photo">
+            <input
+              #file
+              type="file"
+              accept="image/*"
+              multiple
+              class="visually-hidden"
+              (change)="addPhotos(file)"
+            />
+            <span aria-hidden="true">+</span>
+            <span class="visually-hidden">Add photos</span>
+          </label>
+        }
+        @for (photo of photos(); track $index) {
+          <div class="thumb">
+            <app-photo [src]="photo" alt="Uploaded photo" />
+            <button type="button" aria-label="Remove photo" (click)="removePhoto($index)">×</button>
+          </div>
+        } @empty {
+          <div class="thumb placeholder" aria-hidden="true"></div>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="title">What is it</label>
+        <input
+          id="title"
+          class="input"
+          formControlName="title"
+          placeholder="e.g. AirPods Pro case, white"
+          [maxlength]="limits.title"
+          autocomplete="off"
+        />
+        @if (showError('title')) {
+          <span class="field__error">Say what you found.</span>
+        }
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label class="field__label" for="category">Category</label>
+          <select id="category" class="input d-only" formControlName="category">
+            <option value="" disabled>Choose…</option>
+            @for (c of categories; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+          <!-- Mobile: single-select chips (M5), bound to the same control -->
+          <div class="chips m-only" role="radiogroup" aria-label="Category">
+            @for (c of categories; track c) {
+              <button
+                type="button"
+                role="radio"
+                class="chip"
+                [class.active]="form.controls.category.value === c"
+                [attr.aria-checked]="form.controls.category.value === c"
+                (click)="pickCategory(c)"
+              >
+                {{ c }}
+              </button>
+            }
+          </div>
+          @if (showError('category')) {
+            <span class="field__error">Pick a category.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="foundAt">When</label>
+          <input id="foundAt" class="input" type="datetime-local" formControlName="foundAt" />
+          @if (showError('foundAt')) {
+            <span class="field__error">That's in the future.</span>
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="place">Where you found it</label>
+        <div class="row-place">
+          <select id="place" class="input" formControlName="place">
+            <option value="" disabled>Choose a place…</option>
+            @for (p of places; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+          <input
+            class="input"
+            formControlName="placeDetail"
+            placeholder="Detail, e.g. 2nd floor"
+            aria-label="Place detail"
+            [maxlength]="limits.placeDetail"
+          />
+        </div>
+        @if (showError('place')) {
+          <span class="field__error">Where on campus?</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="description">Description</label>
+        <textarea
+          id="description"
+          class="input"
+          rows="3"
+          formControlName="description"
+          [maxlength]="limits.description"
+        ></textarea>
+        <span class="field__hint"
+          >Leave one detail out so the real owner can prove it's theirs.</span
+        >
+      </div>
+
+      <div class="field">
+        <span class="field__label" id="held-label">Where is it now</span>
+        <app-segmented
+          class="boxed"
+          aria-labelledby="held-label"
+          [options]="heldOptions"
+          [value]="form.controls.held.value"
+          (valueChange)="form.controls.held.setValue($event)"
+        />
+      </div>
+    </div>
+
+    <aside class="preview" aria-label="Preview">
+      <span class="label">Preview</span>
+      <app-tag-card [item]="preview()" timeLabel="JUST NOW" />
+    </aside>
+  </div>
+
+  <footer class="foot">
+    <span class="matches">
+      @if (matchCount()) {
+        <span class="dot" aria-hidden="true"></span>
+        {{ matchCount() }} saved search{{ matchCount() === 1 ? '' : 'es' }} match. They'll be
+        notified.
+      }
+    </span>
+    <button type="button" class="btn btn--secondary d-only" (click)="close()">Cancel</button>
+    <button type="submit" class="btn btn--primary" [disabled]="!canPost()">Post item</button>
+  </footer>
+</form>

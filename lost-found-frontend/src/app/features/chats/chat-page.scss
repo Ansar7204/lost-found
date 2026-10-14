@@ -1,0 +1,71 @@
+@use 'mixins' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  border-right: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+
+  @include mobile {
+    max-width: none;
+    border: 0;
+  }
+}
+
+.head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 60px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: var(--text-2);
+}
+
+.who {
+  min-width: 0;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.about {
+  display: block;
+  @include mono(11px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.thread {
+  flex: 1;
+}
+
+.missing {
+  padding: 60px 16px;
+  text-align: center;
+  color: var(--text-3);
+
+  a {
+    color: var(--text);
+    text-decoration: underline;
+  }
+}

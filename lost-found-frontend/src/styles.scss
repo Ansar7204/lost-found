@@ -1,0 +1,235 @@
+// Global styles: tokens, base element styles and the few shared UI classes
+// (buttons, inputs, status pill) that are used across many components.
+// Everything else is component-scoped SCSS next to its component.
+@use 'tokens';
+@use 'mixins' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--text);
+  outline-offset: 2px;
+}
+
+// ---- Buttons -------------------------------------------------------------
+
+.btn {
+  @include reset-button;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  font-weight: 700;
+  white-space: nowrap;
+  transition: var(--transition-hover);
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  @include mobile {
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
+.btn--primary {
+  background: var(--text);
+  color: var(--text-on-light);
+
+  &:not(:disabled):hover {
+    background: #fff;
+  }
+}
+
+.btn--secondary {
+  border: 1px solid var(--border-button);
+  color: var(--text);
+
+  &:not(:disabled):hover {
+    background: var(--surface);
+  }
+}
+
+.btn--success {
+  border: 1px solid var(--status-returned);
+  color: var(--status-returned);
+}
+
+.btn--ghost {
+  color: var(--text-3);
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.btn--block {
+  width: 100%;
+}
+
+// ---- Form controls -------------------------------------------------------
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.field__label {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.field__hint {
+  font-size: 12px;
+  color: var(--text-4);
+}
+
+.field__error {
+  font-size: 12px;
+  color: var(--status-unread);
+}
+
+.input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  background: transparent;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-control);
+  color: var(--text);
+  font: inherit;
+
+  &::placeholder {
+    color: var(--text-4);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--text);
+  }
+
+  @include mobile {
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
+textarea.input {
+  height: auto;
+  min-height: 60px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+select.input {
+  appearance: none;
+  padding-right: 28px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-3) 50%),
+    linear-gradient(135deg, var(--text-3) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 10px) 50%;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+
+  option {
+    background: var(--bg);
+  }
+}
+
+// ---- Status pill: 6px dot + label inside a surface pill ------------------
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: var(--radius-badge);
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--dot, var(--text-4));
+  }
+}
+
+.pill--new {
+  --dot: var(--status-new);
+}
+
+.pill--returned {
+  --dot: var(--status-returned);
+}
+
+// Small red counter used on nav items and the bell.
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--status-unread);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mono {
+  @include mono(10px);
+}
+
+.muted {
+  color: var(--text-4);
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}

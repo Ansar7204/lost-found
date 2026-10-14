@@ -1,0 +1,74 @@
+<header class="topbar">
+  <a class="brand" routerLink="/" aria-label="Lost & Found home">
+    <app-logo [withWordmark]="true" />
+  </a>
+
+  <nav class="nav" aria-label="Main">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      >Browse</a
+    >
+    <a routerLink="/alerts" routerLinkActive="active">
+      Saved searches
+      @if (unreadAlerts()) {
+        <span class="count-badge" aria-label="unread notifications">{{ unreadAlerts() }}</span>
+      }
+    </a>
+    <a routerLink="/me" routerLinkActive="active">My posts</a>
+    <a routerLink="/chats" routerLinkActive="active">
+      Chats
+      @if (unreadChats()) {
+        <span class="count-badge" aria-label="unread chats">{{ unreadChats() }}</span>
+      }
+    </a>
+  </nav>
+
+  <div class="spacer"></div>
+
+  <label class="search">
+    <span class="search-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Search found items</span>
+    <input
+      #box
+      type="search"
+      placeholder="Search found items"
+      [value]="query()"
+      (input)="search(box.value)"
+    />
+  </label>
+
+  <a class="btn btn--primary" routerLink="/post" queryParamsHandling="preserve"
+    >+ Post found item</a
+  >
+
+  @if (auth.currentUser(); as user) {
+    <a routerLink="/me" [attr.aria-label]="'Profile of ' + user.name">
+      <app-avatar [initials]="user.initials" />
+    </a>
+  }
+</header>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<nav class="tabbar" aria-label="Main">
+  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    <span class="tab-icon icon-browse" aria-hidden="true"></span>Browse
+  </a>
+  <a routerLink="/alerts" routerLinkActive="active">
+    <span class="tab-icon icon-bell" aria-hidden="true"></span>Alerts
+    @if (unreadAlerts()) {
+      <span class="count-badge dot">{{ unreadAlerts() }}</span>
+    }
+  </a>
+  <a class="post" routerLink="/post" aria-label="Post found item"><span>+</span></a>
+  <a routerLink="/chats" routerLinkActive="active">
+    <span class="tab-icon icon-chat" aria-hidden="true"></span>Chats
+    @if (unreadChats()) {
+      <span class="count-badge dot">{{ unreadChats() }}</span>
+    }
+  </a>
+  <a routerLink="/me" routerLinkActive="active">
+    <span class="tab-icon icon-me" aria-hidden="true"></span>Me
+  </a>
+</nav>

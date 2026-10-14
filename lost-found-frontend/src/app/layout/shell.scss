@@ -1,0 +1,231 @@
+@use 'mixins' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+// ---- Desktop top bar (D1) --------------------------------------------------
+
+.topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--topbar-height);
+  padding-right: 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 18px;
+  border-right: 1px solid var(--border);
+}
+
+.nav {
+  display: flex;
+  gap: 26px;
+  margin-left: 10px;
+  font-weight: 600;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-3);
+    white-space: nowrap;
+
+    &:hover,
+    &.active {
+      color: var(--text);
+    }
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 300px;
+  min-width: 140px;
+  height: 32px;
+  flex-shrink: 1;
+  border: 1px solid var(--border-input);
+  border-radius: 16px;
+
+  &:focus-within {
+    border-color: var(--text);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 12px 0 30px;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    outline: none;
+
+    &::placeholder {
+      color: var(--text-4);
+    }
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--text-4);
+  border-radius: 50%;
+}
+
+// ---- Mobile tab bar (M2) ---------------------------------------------------
+
+.tabbar {
+  display: none;
+
+  @include mobile {
+    flex: none;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: start;
+    height: var(--tabbar-height);
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-sunken);
+  }
+
+  a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-4);
+
+    &.active {
+      color: var(--text);
+    }
+  }
+
+  .post span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--text);
+    color: var(--text-on-light);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .dot {
+    position: absolute;
+    top: -4px;
+    left: calc(50% + 4px);
+  }
+}
+
+// Detail / chat pages take the whole screen on mobile.
+:host(.fullscreen) .tabbar {
+  @include mobile {
+    display: none;
+  }
+}
+
+// Tiny CSS-only icons, as in the design (no icon font needed).
+.tab-icon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+
+.icon-browse {
+  background:
+    linear-gradient(currentColor 0 0) 0 0 / 7px 7px no-repeat,
+    linear-gradient(currentColor 0 0) 100% 0 / 7px 7px no-repeat,
+    linear-gradient(currentColor 0 0) 0 100% / 7px 7px no-repeat,
+    linear-gradient(currentColor 0 0) 100% 100% / 7px 7px no-repeat;
+  opacity: 0.9;
+}
+
+.icon-bell {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1px 3px 4px;
+    border: 1.5px solid currentColor;
+    border-radius: 6px 6px 2px 2px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 7px;
+    width: 4px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+}
+
+.icon-chat::before {
+  content: '';
+  position: absolute;
+  inset: 2px 1px 3px;
+  border: 1.5px solid currentColor;
+  border-radius: 6px 6px 6px 1px;
+}
+
+.icon-me {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 1px;
+    left: 2px;
+    width: 14px;
+    height: 6px;
+    border: 1.5px solid currentColor;
+    border-bottom: 0;
+    border-radius: 7px 7px 0 0;
+  }
+}

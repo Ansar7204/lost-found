@@ -1,0 +1,103 @@
+<section class="main" [class.m-hidden]="tab() !== 'searches'">
+  <header class="head">
+    <h1 class="title">Saved searches</h1>
+    <a class="btn btn--secondary" routerLink="/">+ New search</a>
+  </header>
+
+  <!-- Mobile tabs (M6) -->
+  <app-segmented class="boxed m-tabs" [options]="tabs()" [(value)]="tab" />
+
+  <div class="table" role="table" aria-label="Saved searches">
+    <div class="tr th" role="row">
+      <span role="columnheader">Name</span>
+      <span role="columnheader">Filters</span>
+      <span role="columnheader">Notify via</span>
+      <span role="columnheader">Matches</span>
+      <span role="columnheader">On</span>
+    </div>
+
+    @for (s of store.searches(); track s.id) {
+      <div class="tr" role="row">
+        <span role="cell" class="name">
+          <button type="button" (click)="openSearch(s)">{{ s.name }}</button>
+        </span>
+        <span role="cell" class="tags">
+          @for (t of tags(s); track t) {
+            <span class="tag">{{ t }}</span>
+          }
+        </span>
+        <span role="cell">
+          <select
+            class="channel"
+            [attr.aria-label]="'Notify via for ' + s.name"
+            #channel
+            (change)="changeChannel(s, channel.value)"
+          >
+            @for (c of channels; track c) {
+              <option [value]="c" [selected]="c === s.channel">{{ c }}</option>
+            }
+          </select>
+        </span>
+        <span role="cell" class="matches">
+          @if (s.newMatches) {
+            <span class="dot" aria-hidden="true"></span>
+            <span class="mono strong"
+              >{{ s.newMatches }} NEW MATCH{{ s.newMatches === 1 ? '' : 'ES' }}</span
+            >
+          } @else {
+            <span class="muted">None yet</span>
+          }
+        </span>
+        <span role="cell" class="on">
+          <app-toggle
+            [checked]="s.on"
+            [label]="'Alerts for ' + s.name"
+            (checkedChange)="store.setOn(s.id, $event)"
+          />
+          <button
+            type="button"
+            class="remove"
+            [attr.aria-label]="'Delete ' + s.name"
+            (click)="store.remove(s.id)"
+          >
+            ×
+          </button>
+        </span>
+      </div>
+    } @empty {
+      <p class="empty">
+        No saved searches. Filter on <a routerLink="/">Browse</a> and press “Save search & notify
+        me”.
+      </p>
+    }
+  </div>
+</section>
+
+<aside class="notifs" [class.m-hidden]="tab() !== 'notifications'">
+  <h1 class="m-title">Alerts</h1>
+  <app-segmented class="boxed m-tabs" [options]="tabs()" [(value)]="tab" />
+
+  <header class="notifs-head">
+    <h2>Notifications</h2>
+    @if (store.unreadCount()) {
+      <button type="button" class="link" (click)="store.markAllRead()">Mark all read</button>
+    }
+  </header>
+
+  <ul class="notif-list">
+    @for (n of store.notifications(); track n.id) {
+      <li>
+        <button type="button" class="notif" [class.unread]="!n.read" (click)="openNotification(n)">
+          <span class="unread-dot" aria-hidden="true"></span>
+          <span class="notif-text">
+            <span class="notif-title">{{ n.title }}</span>
+            <span class="notif-sub">{{ n.sub }}</span>
+          </span>
+          <span class="mono">{{ n.createdAt | timeAgo }}</span>
+        </button>
+      </li>
+    } @empty {
+      <li class="empty">Nothing yet.</li>
+    }
+  </ul>
+</aside>

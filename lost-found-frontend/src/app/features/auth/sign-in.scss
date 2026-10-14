@@ -1,0 +1,143 @@
+@use 'mixins' as *;
+
+:host {
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  background: var(--bg-sunken);
+}
+
+// Mobile layout (M1), centered on desktop.
+.screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  width: 100%;
+  max-width: 390px;
+  padding: 72px 22px 28px;
+  --bg: var(--bg-sunken); // logo hole matches the page
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.headline {
+  @include headline(44px, 122, 850, -0.03em);
+  line-height: 0.95;
+}
+
+.muted {
+  color: var(--text-4);
+}
+
+.tagline {
+  color: var(--text-3);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .btn {
+    height: 44px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+}
+
+.email-input {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  font-size: 14px;
+
+  &:focus-within {
+    border-color: var(--text);
+  }
+
+  &.invalid {
+    border-color: var(--status-unread);
+  }
+}
+
+// Input and sizer share one grid cell; the sizer decides the width.
+.grow {
+  display: inline-grid;
+  min-width: 0;
+  max-width: 70%;
+
+  > * {
+    grid-area: 1 / 1;
+    min-width: 1ch;
+    padding: 0;
+    font: inherit;
+    white-space: pre;
+  }
+
+  .sizer {
+    visibility: hidden;
+    overflow: hidden;
+  }
+
+  input {
+    width: 100%;
+    border: 0;
+    background: none;
+    color: var(--text);
+    outline: none;
+
+    &::placeholder {
+      color: var(--text-4);
+    }
+  }
+}
+
+.suffix {
+  flex: none;
+  color: var(--text-4);
+}
+
+.code {
+  height: 44px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+.caption {
+  color: var(--text-4);
+  font-size: 12px;
+  text-align: center;
+}
+
+.link {
+  @include reset-button;
+  color: var(--text-2);
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
