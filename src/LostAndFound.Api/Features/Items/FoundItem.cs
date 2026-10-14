@@ -11,7 +11,7 @@ public class FoundItem
     public FoundItemStatus Status { get; private set; }
     public DateTimeOffset FoundAt { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
-    public string? PhotoKey {get;set;}
+    public string? PhotoKey {get;private set;}
 
     private FoundItem()
     { }
@@ -42,5 +42,12 @@ public class FoundItem
     public void MarkReturned()
     {
         Status = FoundItemStatus.Returned;
+    }
+    public void SetPhoto(string photoKey)
+    {
+        if (string.IsNullOrWhiteSpace(photoKey))
+            throw new ArgumentException("Photo key cannot be empty.", nameof(photoKey));
+
+        PhotoKey = photoKey;
     }
 }
