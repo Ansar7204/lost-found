@@ -23,7 +23,8 @@ public sealed class GetFoundItemController(AppDbContext db) : ControllerBase
             x.Cabinet,
             x.Category,
             x.Status,
-            x.CreatedAt
+            x.CreatedAt,
+            x.PhotoKey == null ? null : "/api/items/" + x.Id + "/photo"
         )).SingleOrDefaultAsync(cancellationToken);
 
         if(item is null)
@@ -43,5 +44,6 @@ public sealed record GetFoundItemResponse(
     string Cabinet,
     ItemCategory Category,
     FoundItemStatus Status,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    string? PhotoUrl
 );

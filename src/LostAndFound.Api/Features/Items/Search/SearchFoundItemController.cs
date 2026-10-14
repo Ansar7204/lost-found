@@ -40,7 +40,8 @@ public sealed class SearchFoundItemsController(AppDbContext db) : ControllerBase
                 x.Category,
                 x.Cabinet,
                 x.Status,
-                x.CreatedAt
+                x.CreatedAt,
+                x.PhotoKey == null ? null : "/api/items/" + x.Id + "/photo"
             )).ToListAsync(cancellationToken);
 
         return Ok(new SearchFoundItemsResponse(
@@ -75,7 +76,8 @@ public sealed record SearchFoundItemResponse(
     ItemCategory Category,
     string Cabinet,
     FoundItemStatus Status,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt,
+    string? PhotoUrl);
 
 public sealed record SearchFoundItemsResponse(
     IReadOnlyList<SearchFoundItemResponse> Items,
