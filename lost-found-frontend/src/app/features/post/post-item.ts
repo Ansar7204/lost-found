@@ -8,6 +8,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ApiError } from '../../core/api/api-error.interceptor';
+import { FORM_FIELD_FROM_API } from '../../core/api/items-api.mapper';
 import { AuthService } from '../../core/auth/auth.service';
 import { CATEGORIES, Category, HELD_OPTIONS, Item, PLACES, Place } from '../../core/models/models';
 import { ItemsStore } from '../../core/state/items.store';
@@ -68,13 +70,16 @@ export class PostItem {
   protected readonly photos = signal<string[]>([]);
   protected readonly maxPhotos = MAX_PHOTOS;
   protected readonly submitted = signal(false);
+  protected readonly posting = signal(false);
+  /** Error not tied to one field (network, 500, ...). */
+  protected readonly formError = signal('');
 
   /** Form value as a signal, so the preview can be a plain computed(). */
   private readonly value = toSignal(this.form.valueChanges, {
     initialValue: this.form.getRawValue(),
   });
   private readonly status = toSignal(this.form.statusChanges, { initialValue: this.form.status });
-  protected readonly canPost = computed(() => this.status() === 'VALID');
+  protected readonly canPost = computed(() => this.status() === 'VALID' && !this.posting());
 
   protected readonly preview = computed<Item>(() => {
     const v = { ...this.form.getRawValue(), ...this.value() };
@@ -121,24 +126,57 @@ export class PostItem {
     return control.invalid && (control.touched || this.submitted());
   }
 
-  protected submit(): void {
+  /** Message the API sent for this field (400 ValidationProblem), if any. */
+  protected serverError(name: 'title' | 'category' | 'foundAt' | 'place' | 'description'): string {
+    const errors = this.form.controls[name].errors;
+    return typeof errors?.['server'] === 'string' ? errors['server'] : '';
+  }
+
+  protected async submit(): Promise<void> {
     this.submitted.set(true);
-    if (this.form.invalid) {
+    this.formError.set('');
+    if (this.form.invalid || this.posting()) {
       this.form.markAllAsTouched();
       return;
     }
     const v = this.form.getRawValue();
-    const item = this.itemsStore.post({
-      title: v.title.trim(),
-      category: v.category as Category,
-      place: v.place as Place,
-      placeDetail: v.placeDetail.trim() || undefined,
-      held: v.held,
-      foundAt: new Date(v.foundAt).toISOString(),
-      description: v.description.trim(),
-      photos: this.photos(),
-    });
-    this.router.navigate(['/item', item.no]);
+    this.posting.set(true);
+    try {
+      const item = await this.itemsStore.post({
+        title: v.title.trim(),
+        category: v.category as Category,
+        place: v.place as Place,
+        placeDetail: v.placeDetail.trim() || undefined,
+        held: v.held,
+        foundAt: new Date(v.foundAt).toISOString(),
+        description: v.description.trim(),
+        photos: this.photos(),
+      });
+      await this.router.navigate(['/item', item.no]);
+    } catch (error) {
+      this.showServerErrors(error);
+    } finally {
+      this.posting.set(false);
+    }
+  }
+
+  /** Put the API's validation messages next to the matching fields. */
+  private showServerErrors(error: unknown): void {
+    if (!(error instanceof ApiError)) {
+      this.formError.set('Could not post the item. Please try again.');
+      return;
+    }
+    let placed = false;
+    for (const [apiField, messages] of Object.entries(error.fieldErrors)) {
+      const name = FORM_FIELD_FROM_API[apiField.replace(/^\$\./, '').toLowerCase()];
+      const control = name ? this.form.controls[name] : undefined;
+      if (control && messages.length) {
+        control.setErrors({ ...control.errors, server: messages[0] });
+        control.markAsTouched();
+        placed = true;
+      }
+    }
+    if (!placed) this.formError.set(error.message);
   }
 
   protected close(): void {

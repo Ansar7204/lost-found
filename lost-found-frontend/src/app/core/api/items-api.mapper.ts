@@ -1,25 +1,23 @@
 import { Category, Item, ItemStatus, PLACES, Place } from '../models/models';
 import {
   ApiCreateFoundItemRequest,
+  ApiFoundItem,
   ApiFoundItemStatus,
-  ApiGetFoundItemResponse,
   ApiItemCategory,
-  ApiSearchFoundItemResponse,
 } from './api.types';
 
 // Adapter between the backend's wire format and the frontend model.
-//
-// The backend and the design don't agree on everything yet (see
-// docs/BACKEND_INTEGRATION.md). All of that disagreement is contained here,
-// so the rest of the app doesn't care.
+// All remaining disagreement between API and design is contained here.
 
 const CATEGORY_FROM_API: Record<ApiItemCategory, Category> = {
-  [ApiItemCategory.Accessory]: 'Other',
+  [ApiItemCategory.Accessory]: 'Other', // legacy value, no UI category
   [ApiItemCategory.Clothing]: 'Clothing',
   [ApiItemCategory.Electronics]: 'Electronics',
   [ApiItemCategory.Documents]: 'Cards & IDs',
   [ApiItemCategory.Keys]: 'Keys',
   [ApiItemCategory.Other]: 'Other',
+  [ApiItemCategory.Bottles]: 'Bottles',
+  [ApiItemCategory.BooksAndNotes]: 'Books & notes',
 };
 
 const CATEGORY_TO_API: Record<Category, ApiItemCategory> = {
@@ -27,8 +25,8 @@ const CATEGORY_TO_API: Record<Category, ApiItemCategory> = {
   'Cards & IDs': ApiItemCategory.Documents,
   Keys: ApiItemCategory.Keys,
   Clothing: ApiItemCategory.Clothing,
-  Bottles: ApiItemCategory.Accessory,
-  'Books & notes': ApiItemCategory.Other,
+  Bottles: ApiItemCategory.Bottles,
+  'Books & notes': ApiItemCategory.BooksAndNotes,
   Other: ApiItemCategory.Other,
 };
 
@@ -60,43 +58,55 @@ export function joinCabinet(place: Place, placeDetail?: string): string {
   return placeDetail?.trim() ? `${place} · ${placeDetail.trim()}` : place;
 }
 
-/** Backend ids are GUIDs; the UI shows a short "Nº" made from the first 4 hex chars. */
-export function shortNo(id: string): string {
-  return id.replace(/-/g, '').slice(0, 4).toUpperCase();
+/** 413 -> "0413" */
+export function formatNo(number: number): string {
+  return String(number).padStart(4, '0');
 }
 
-export function itemFromSearchResult(dto: ApiSearchFoundItemResponse): Item {
+export function itemFromApi(dto: ApiFoundItem): Item {
   return {
-    no: shortNo(dto.id),
+    id: dto.id,
+    no: formatNo(dto.number),
     title: dto.name,
     category: categoryFromApi(dto.category),
     ...splitCabinet(dto.cabinet),
-    held: 'With finder',
-    // The list endpoint doesn't return foundAt yet; createdAt is the closest.
-    foundAt: dto.createdAt,
-    description: '',
-    photos: [],
-    finderId: '',
+    held: dto.heldAt || 'With finder',
+    foundAt: dto.foundAt,
+    createdAt: dto.createdAt,
+    description: dto.description,
+    photos: dto.photoUrl ? [dto.photoUrl] : [],
+    photoCaption: dto.name.toLowerCase().slice(0, 24),
+    finderId: dto.userFoundId,
+    finderName: dto.finderName || undefined,
     status: statusFromApi(dto.status),
   };
 }
 
-export function itemFromDetails(dto: ApiGetFoundItemResponse): Item {
-  return {
-    ...itemFromSearchResult(dto),
-    description: dto.description,
-    finderId: dto.userFoundId,
-  };
-}
-
 export function toCreateRequest(
-  item: Pick<Item, 'title' | 'description' | 'category' | 'place' | 'placeDetail' | 'foundAt'>,
+  item: Pick<
+    Item,
+    'title' | 'description' | 'category' | 'place' | 'placeDetail' | 'foundAt' | 'held'
+  >,
 ): ApiCreateFoundItemRequest {
   return {
     name: item.title.trim(),
     description: item.description.trim(),
     category: categoryToApi(item.category),
     cabinet: joinCabinet(item.place, item.placeDetail),
+    heldAt: item.held,
     foundAt: new Date(item.foundAt).toISOString(),
   };
 }
+
+/** ASP.NET field name (C# property) -> Post form control name. */
+export const FORM_FIELD_FROM_API: Record<
+  string,
+  'title' | 'description' | 'category' | 'place' | 'foundAt' | 'held'
+> = {
+  name: 'title',
+  description: 'description',
+  category: 'category',
+  cabinet: 'place',
+  foundat: 'foundAt',
+  heldat: 'held',
+};

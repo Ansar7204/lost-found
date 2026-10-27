@@ -102,7 +102,19 @@
     </button>
   </div>
 
-  @if (visibleItems().length) {
+  @if (error()) {
+    <div class="empty" role="alert">
+      <p class="empty-title">Couldn't load items</p>
+      <p>{{ error() }}</p>
+      <button type="button" class="btn btn--secondary" (click)="retry()">Try again</button>
+    </div>
+  } @else if (firstLoad()) {
+    <ul class="grid" aria-busy="true" aria-label="Loading items">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <li class="skeleton" aria-hidden="true"></li>
+      }
+    </ul>
+  } @else if (visibleItems().length) {
     <ul class="grid">
       @for (item of visibleItems(); track item.no) {
         <li>

@@ -311,3 +311,26 @@
     }
   }
 }
+
+// Loading state: card-shaped placeholders while the first page arrives.
+.skeleton {
+  aspect-ratio: 3 / 4;
+  border-radius: 6px;
+  @include striped-placeholder;
+  animation: pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

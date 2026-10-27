@@ -5,10 +5,9 @@ something browse, filter by category and place, message the finder, and save sea
 notify them when a matching item is posted.
 
 This is the **frontend MVP**: Angular 22 + TypeScript + SCSS, built from the design handoff in
-[`docs/design/`](docs/design/README.md) ("warm workspace" direction). It runs entirely in the
-browser on mock data kept in `localStorage`, so every flow works without a server. A typed client
-for the real ASP.NET Core backend ([tamirlanm/lost-found](https://github.com/tamirlanm/lost-found))
-is already in [`src/app/core/api/`](src/app/core/api) for when it's ready.
+[`docs/design/`](docs/design/README.md) ("warm workspace" direction). Since Sprint 1, sign-in,
+posting and browsing items run on the ASP.NET Core API in this repo (`../src/LostAndFound.Api`);
+chats, saved searches and notifications are still kept in `localStorage` until their APIs land.
 
 > Learning Angular with this project? Start with **[docs/LEARNING.md](docs/LEARNING.md)**.
 > Connecting the real backend? See **[docs/BACKEND_INTEGRATION.md](docs/BACKEND_INTEGRATION.md)**.
@@ -18,22 +17,27 @@ is already in [`src/app/core/api/`](src/app/core/api) for when it's ready.
 Requires **Node.js 22.22.3+ or 24+** (see `.nvmrc`).
 
 ```bash
+# from the repo root: databases + API (see docs/BACKEND_INTEGRATION.md)
+docker compose up -d
+dotnet run --project src/LostAndFound.Api --launch-profile http   # http://localhost:5043
+
+# here
 npm install
-npm start            # http://localhost:4200
+npm start            # http://localhost:4200, /api is proxied to :5043
 ```
 
-| Command                | What it does                                |
-| ---------------------- | ------------------------------------------- |
-| `npm start`            | Dev server with live reload                 |
-| `npm run build`        | Production build into `dist/lost-found/`    |
-| `npm test`             | Unit tests (Vitest) in watch mode           |
-| `npm run test:ci`      | Unit tests once, like CI does               |
-| `npm run format`       | Format all code with Prettier               |
+| Command           | What it does                             |
+| ----------------- | ---------------------------------------- |
+| `npm start`       | Dev server with live reload              |
+| `npm run build`   | Production build into `dist/lost-found/` |
+| `npm test`        | Unit tests (Vitest) in watch mode        |
+| `npm run test:ci` | Unit tests once, like CI does            |
+| `npm run format`  | Format all code with Prettier            |
 
 ## Demo script (≈3 minutes)
 
-1. **Sign in** as Aruzhan: click **Aruzhan** under "Demo accounts" (or type any `@kbtu.kz` login),
-   then any 6 digits.
+1. **Sign in** as Aruzhan: click **Aruzhan** under "Demo accounts" (or type any `@kbtu.kz` login).
+   Locally this is the development sign-in; production uses "Sign in with Microsoft".
 2. **Browse**: pick a category, tick places, switch Today / This week / This month, type in the
    search bar. The URL changes with every filter, so you can refresh or share the link.
 3. **Save a search**: "Save search & notify me" turns green: "✓ Alerts on for this search".
@@ -49,7 +53,8 @@ npm start            # http://localhost:4200
 7. Resize the window below 1024px (or open DevTools device mode) to see the **mobile layout** with
    the bottom tab bar.
 
-**Me → Settings** switches user in the same tab and has **Reset demo data**.
+**Me → Settings** switches user in the same tab (dev sign-in only) and can clear local chats and
+alerts. Items live in Postgres; restart from scratch with `docker compose down -v`.
 
 ## Tech stack
 
@@ -75,7 +80,7 @@ src/
     │   ├── models/         Domain types used by the UI (Item, SavedSearch, ...)
     │   ├── data/           DbStore (the single source of truth), seed data, storage
     │   ├── state/          Feature stores: ItemsStore, AlertsStore, ChatStore
-    │   ├── auth/           AuthService (demo sign-in) and route guards
+    │   ├── auth/           AuthService (MSAL / dev sign-in), auth interceptor, route guards
     │   ├── api/            Real backend: DTOs, mapper, HTTP client, error interceptor
     │   └── util/           Pure helpers (matching, images, viewport)
     ├── shared/             Reusable presentational pieces
@@ -94,24 +99,24 @@ src/
 
 ## Routes
 
-| Route        | Screen                                             |
-| ------------ | -------------------------------------------------- |
-| `/signin`    | Sign in                                            |
-| `/`          | Browse (filters in the query string)               |
-| `/post`      | Post modal on top of Browse                        |
-| `/item/:no`  | Item detail (`/item/0412`)                         |
-| `/chats`     | All conversations                                  |
-| `/chats/:id` | One conversation                                   |
-| `/alerts`    | Saved searches and notifications                   |
-| `/me`        | My posts, Got back, Settings                       |
+| Route        | Screen                               |
+| ------------ | ------------------------------------ |
+| `/signin`    | Sign in                              |
+| `/`          | Browse (filters in the query string) |
+| `/post`      | Post modal on top of Browse          |
+| `/item/:no`  | Item detail (`/item/0412`)           |
+| `/chats`     | All conversations                    |
+| `/chats/:id` | One conversation                     |
+| `/alerts`    | Saved searches and notifications     |
+| `/me`        | My posts, Got back, Settings         |
 
 ## Status
 
-| Area                               | State                                                  |
-| ---------------------------------- | ------------------------------------------------------ |
-| All MVP screens, desktop + mobile  | Done (mock data)                                       |
-| Post → saved search → notification | Done, live across tabs                                 |
-| Chat, mark as returned             | Done (auto-reply is fake)                              |
-| Photo upload                       | Resized in the browser and stored locally              |
-| Real backend                       | Client + mapper ready and tested, not wired in yet     |
-| Real sign-in (Microsoft Entra ID)  | Not started, see backend integration doc               |
+| Area                              | State                                                   |
+| --------------------------------- | ------------------------------------------------------- |
+| Sign in with KBTU account (US-01) | API: Entra ID (MSAL) in production, dev sign-in locally |
+| Post a found item (US-02)         | API, server validation shown on the form                |
+| Browse by category (US-03)        | API, loading / empty / error states                     |
+| Mark as returned                  | API (`PATCH`); owner's "Got back" waits for US-07/10    |
+| Photo upload                      | First photo uploaded to the API (up to 3 in US-11)      |
+| Chat, saved searches, alerts      | Still local (`localStorage`), Sprints 2–3               |

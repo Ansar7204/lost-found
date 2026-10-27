@@ -3,14 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Item } from '../models/models';
-import {
-  ApiCreateFoundItemResponse,
-  ApiGetFoundItemResponse,
-  ApiMeResponse,
-  ApiSearchFoundItemsRequest,
-  ApiSearchFoundItemsResponse,
-} from './api.types';
-import { itemFromDetails, itemFromSearchResult, toCreateRequest } from './items-api.mapper';
+import { ApiFoundItem, ApiSearchFoundItemsRequest, ApiSearchFoundItemsResponse } from './api.types';
+import { itemFromApi, toCreateRequest } from './items-api.mapper';
 
 export interface ItemsPage {
   items: Item[];
@@ -20,50 +14,58 @@ export interface ItemsPage {
 }
 
 /**
- * Typed client for the real backend (tamirlanm/lost-found).
+ * Typed client for the items API. Credentials are added by authInterceptor,
+ * errors are normalized to ApiError by apiErrorInterceptor.
  *
- * NOT wired into the UI yet: the demo runs on the local DbStore because the
- * API needs Microsoft Entra ID tokens and has no endpoints for saved
- * searches, chat or notifications yet. docs/BACKEND_INTEGRATION.md explains
- * how to switch the ItemsStore over to this service.
- *
- * Pattern to notice: HttpClient returns cold Observables; nothing is sent
- * until someone subscribes (or converts them with toSignal / rxResource).
+ * HttpClient returns cold Observables: nothing is sent until someone subscribes.
  */
 @Injectable({ providedIn: 'root' })
 export class ItemsApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/items`;
 
+  /** US-03: GET /api/items with filters, newest first. */
   search(request: ApiSearchFoundItemsRequest = {}): Observable<ItemsPage> {
-    // HttpParams skips nothing by itself, so only add what is set.
+    // Only send the filters that are set.
     let params = new HttpParams();
     for (const [key, value] of Object.entries(request)) {
-      if (value !== undefined && value !== null && value !== '') {
+      if (value !== undefined && value !== null && value !== '' && value !== false) {
         params = params.set(key, String(value));
       }
     }
 
     return this.http
       .get<ApiSearchFoundItemsResponse>(this.baseUrl, { params })
-      .pipe(map((res) => ({ ...res, items: res.items.map(itemFromSearchResult) })));
+      .pipe(map((res) => ({ ...res, items: res.items.map(itemFromApi) })));
   }
 
   getById(id: string): Observable<Item> {
-    return this.http
-      .get<ApiGetFoundItemResponse>(`${this.baseUrl}/${id}`)
-      .pipe(map(itemFromDetails));
+    return this.http.get<ApiFoundItem>(`${this.baseUrl}/${id}`).pipe(map(itemFromApi));
   }
 
-  create(item: Parameters<typeof toCreateRequest>[0]): Observable<ApiCreateFoundItemResponse> {
-    return this.http.post<ApiCreateFoundItemResponse>(this.baseUrl, toCreateRequest(item));
+  /** By the short number from the URL: /item/0413 -> GET /api/items/413 */
+  getByNo(no: string): Observable<Item> {
+    return this.http.get<ApiFoundItem>(`${this.baseUrl}/${Number(no)}`).pipe(map(itemFromApi));
+  }
+
+  /** US-02: POST /api/items. Resolves to the created item (with its Nº). */
+  create(item: Parameters<typeof toCreateRequest>[0]): Observable<Item> {
+    return this.http.post<ApiFoundItem>(this.baseUrl, toCreateRequest(item)).pipe(map(itemFromApi));
+  }
+
+  /** POST /api/items/{id}/photo (multipart, JPEG/PNG ≤ 5 MB, one photo per item for now). */
+  uploadPhoto(id: string, photo: Blob): Observable<{ photoUrl: string }> {
+    const form = new FormData();
+    form.append('photo', photo, photo.type === 'image/png' ? 'photo.png' : 'photo.jpg');
+    return this.http.post<{ photoUrl: string }>(`${this.baseUrl}/${id}/photo`, form);
   }
 
   markReturned(id: string): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/${id}/returned`, null);
   }
 
-  me(): Observable<ApiMeResponse> {
-    return this.http.get<ApiMeResponse>(`${environment.apiBaseUrl}/me`);
+  /** Raw bytes of a protected URL (photos need the auth header, so <img src> can't load them). */
+  blob(url: string): Observable<Blob> {
+    return this.http.get(url, { responseType: 'blob' });
   }
 }

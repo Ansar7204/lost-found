@@ -5,8 +5,23 @@
     <p class="tagline">Find what you lost on campus, or post what you found.</p>
   </div>
 
-  @if (step() === 'email') {
-    <form class="form" [formGroup]="emailForm" (ngSubmit)="continue()">
+  @if (auth.mode === 'msal') {
+    <div class="form">
+      @if (error()) {
+        <p class="field__error" role="alert">{{ error() }}</p>
+      }
+      <button
+        class="btn btn--primary btn--block"
+        type="button"
+        [disabled]="busy()"
+        (click)="microsoft()"
+      >
+        {{ busy() ? 'Opening Microsoft…' : 'Sign in with Microsoft' }}
+      </button>
+      <p class="caption">Use your university account ({{ domain }}).</p>
+    </div>
+  } @else {
+    <form class="form" [formGroup]="emailForm" (ngSubmit)="signInDev()">
       <label class="field__label" for="login">University email</label>
       <div class="email-input" [class.invalid]="error()">
         <!-- The invisible sizer grows with the text, so "@kbtu.kz" sits right after it. -->
@@ -27,36 +42,19 @@
       @if (error()) {
         <p class="field__error" role="alert">{{ error() }}</p>
       }
-      <button class="btn btn--primary btn--block" type="submit">Continue</button>
-      <p class="caption">We'll email you a 6-digit code.</p>
+      <button class="btn btn--primary btn--block" type="submit" [disabled]="busy()">
+        {{ busy() ? 'Signing in…' : 'Sign in' }}
+      </button>
+      <p class="caption">Development sign-in: no password, the API trusts the email.</p>
 
       <div class="demo">
         <span class="mono">DEMO ACCOUNTS</span>
         @for (u of demoUsers; track u.login) {
-          <button type="button" class="link" (click)="useDemo(u.login)">{{ u.name }}</button>
+          <button type="button" class="link" [disabled]="busy()" (click)="useDemo(u.login)">
+            {{ u.name }}
+          </button>
         }
       </div>
-    </form>
-  } @else {
-    <form class="form" [formGroup]="codeForm" (ngSubmit)="verify()">
-      <label class="field__label" for="code">Code sent to {{ email }}</label>
-      <input
-        id="code"
-        class="input code"
-        formControlName="code"
-        inputmode="numeric"
-        autocomplete="one-time-code"
-        maxlength="6"
-        placeholder="000000"
-      />
-      @if (error()) {
-        <p class="field__error" role="alert">{{ error() }}</p>
-      }
-      <button class="btn btn--primary btn--block" type="submit">Sign in</button>
-      <p class="caption">
-        Demo: any 6 digits work.
-        <button type="button" class="link" (click)="back()">Change email</button>
-      </p>
     </form>
   }
 </div>

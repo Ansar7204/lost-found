@@ -1,5 +1,10 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import {
   TitleStrategy,
   provideRouter,
@@ -8,6 +13,8 @@ import {
 } from '@angular/router';
 import { routes } from './app.routes';
 import { apiErrorInterceptor } from './core/api/api-error.interceptor';
+import { authInterceptor } from './core/auth/auth.interceptor';
+import { AuthService } from './core/auth/auth.service';
 import { PageTitleStrategy } from './core/page-title.strategy';
 
 /**
@@ -23,7 +30,10 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
     ),
-    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor])),
+    // Order matters: apiErrorInterceptor is outermost, so authInterceptor still sees raw 401s.
+    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor, authInterceptor])),
+    // Restore the session (MSAL redirect / dev user) before the first route guard runs.
+    provideAppInitializer(() => inject(AuthService).init()),
     { provide: TitleStrategy, useClass: PageTitleStrategy },
   ],
 };

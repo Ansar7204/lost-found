@@ -74,7 +74,11 @@
           <app-avatar [initials]="finder.initials" [tone]="isFinder() ? 'green' : 'amber'" />
           <div>
             <p class="finder-name">{{ isFinder() ? 'You found this' : finder.name }}</p>
-            <p class="muted">Returned {{ finder.returnedCount }} items before</p>
+            @if (finder.returnedCount) {
+              <p class="muted">Returned {{ finder.returnedCount }} items before</p>
+            } @else {
+              <p class="muted">KBTU student</p>
+            }
           </div>
         </section>
       }
@@ -114,9 +118,15 @@
       </button>
     }
   </div>
+} @else if (loadState() === 'loading') {
+  <div class="missing" aria-busy="true">
+    <p class="missing-title">Loading Nº {{ no() }}…</p>
+  </div>
 } @else {
   <div class="missing">
-    <p class="missing-title">Nº {{ no() }} doesn't exist</p>
+    <p class="missing-title">
+      {{ loadState() === 'error' ? "Couldn't load Nº " + no() : 'Nº ' + no() + " doesn't exist" }}
+    </p>
     <a class="btn btn--secondary" routerLink="/">← Back to Browse</a>
   </div>
 }

@@ -55,7 +55,7 @@
           autocomplete="off"
         />
         @if (showError('title')) {
-          <span class="field__error">Say what you found.</span>
+          <span class="field__error">{{ serverError('title') || 'Say what you found.' }}</span>
         }
       </div>
 
@@ -84,7 +84,7 @@
             }
           </div>
           @if (showError('category')) {
-            <span class="field__error">Pick a category.</span>
+            <span class="field__error">{{ serverError('category') || 'Pick a category.' }}</span>
           }
         </div>
 
@@ -92,7 +92,9 @@
           <label class="field__label" for="foundAt">When</label>
           <input id="foundAt" class="input" type="datetime-local" formControlName="foundAt" />
           @if (showError('foundAt')) {
-            <span class="field__error">That's in the future.</span>
+            <span class="field__error">{{
+              serverError('foundAt') || "That's in the future."
+            }}</span>
           }
         </div>
       </div>
@@ -115,7 +117,7 @@
           />
         </div>
         @if (showError('place')) {
-          <span class="field__error">Where on campus?</span>
+          <span class="field__error">{{ serverError('place') || 'Where on campus?' }}</span>
         }
       </div>
 
@@ -128,6 +130,9 @@
           formControlName="description"
           [maxlength]="limits.description"
         ></textarea>
+        @if (serverError('description'); as message) {
+          <span class="field__error">{{ message }}</span>
+        }
         <span class="field__hint"
           >Leave one detail out so the real owner can prove it's theirs.</span
         >
@@ -152,6 +157,9 @@
   </div>
 
   <footer class="foot">
+    @if (formError()) {
+      <span class="field__error form-error" role="alert">{{ formError() }}</span>
+    }
     <span class="matches">
       @if (matchCount()) {
         <span class="dot" aria-hidden="true"></span>
@@ -160,6 +168,8 @@
       }
     </span>
     <button type="button" class="btn btn--secondary d-only" (click)="close()">Cancel</button>
-    <button type="submit" class="btn btn--primary" [disabled]="!canPost()">Post item</button>
+    <button type="submit" class="btn btn--primary" [disabled]="!canPost()">
+      {{ posting() ? 'Posting…' : 'Post item' }}
+    </button>
   </footer>
 </form>

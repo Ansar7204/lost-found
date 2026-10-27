@@ -84,10 +84,14 @@ export class ChatPage {
     });
   }
 
-  protected markReturned(): void {
+  protected async markReturned(): Promise<void> {
     const item = this.item();
     if (item && confirm(`Mark “${item.title}” as returned to ${this.other()?.name ?? 'them'}?`)) {
-      this.itemsStore.markReturned(item.no);
+      try {
+        await this.itemsStore.markReturned(item.no);
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'Could not mark it as returned.');
+      }
     }
   }
 }
