@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#D6D1C4;font-family:'Archivo',system-ui,sans-serif;color:#17160F;-webkit-font-smoothing:antialiased}
+a{color:#17160F}a:hover{color:oklch(0.58 0.2 30)}
+*{box-sizing:border-box}
+</style>
+</helmet>
+<section style="padding:80px;display:flex;flex-direction:column;gap:48px;background:#1F1D1A;color:#F2EEE7">
+<div style="display:flex;flex-direction:column;gap:10px;max-width:860px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;color:#857F75">LOST &amp; FOUND · KBTU · TURN 2</div>
+<div style="font-size:40px;font-weight:800;font-variation-settings:'wdth' 118;letter-spacing:-.02em;line-height:1">Direction: warm workspace</div>
+<div style="font-size:15px;line-height:1.5;color:#B0AAA0;text-wrap:pretty">A dense dark UI with thin borders, like a design tool, made its own with warm charcoal greys, notched luggage-tag cards with a hole punch and Nº numbers, and wide Archivo headlines. Colour only shows status: amber = new, green = returned, red = unread.</div>
+</div>
+
+<div id="2a" style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:10px;align-items:center"><span style="background:#F2EEE7;color:#1F1D1A;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px">2a</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#857F75">DESKTOP · 1440</span></div>
+<div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">D1 — Browse (sidebar filters + save are clickable)</div>
+<div data-screen-label="2 D1 Browse" style="width:1440px;height:900px;background:#2A2825;border:1px solid #3B3834;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;font-size:13px">
+<div style="height:48px;flex:none;display:flex;align-items:center;border-bottom:1px solid #3B3834">
+<div style="height:48px;padding:0 18px;display:flex;align-items:center;gap:8px;border-right:1px solid #3B3834"><div style="width:20px;height:24px;background:#F2EEE7;clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% 100%,0 100%,0 5px);display:flex;justify-content:center;padding-top:4px"><div style="width:5px;height:5px;border-radius:50%;background:#2A2825"></div></div><span style="font-weight:800;font-variation-settings:'wdth' 118;font-size:15px;letter-spacing:-.01em">Lost &amp; Found</span></div>
+<div style="display:flex;gap:26px;padding:0 24px;font-weight:600"><span>Browse</span><span style="color:#B0AAA0">Saved searches</span><span style="color:#B0AAA0">My posts</span><span style="color:#B0AAA0;display:flex;gap:6px;align-items:center">Chats <span style="background:#EF5B4C;color:#fff;font-size:10px;font-weight:700;border-radius:8px;padding:1px 6px">2</span></span></div>
+<div style="flex:1"></div>
+<div style="width:300px;height:32px;border:1px solid #4A4640;border-radius:16px;display:flex;align-items:center;gap:8px;padding:0 12px;color:#857F75"><div style="width:11px;height:11px;border:1.5px solid #857F75;border-radius:50%"></div>Search found items</div>
+<div style="margin:0 12px 0 16px;height:30px;padding:0 12px;border-radius:5px;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;font-weight:700">+ Post found item</div>
+<div style="margin-right:16px;width:28px;height:28px;border-radius:50%;background:#4CC27A;color:#1F1D1A;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">A</div>
+</div>
+<div style="flex:1;display:flex;min-height:0">
+<div style="width:232px;flex:none;border-right:1px solid #3B3834;padding:14px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden">
+<div style="padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">CATEGORY</div>
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="8">
+<sc-if value="{{ c.active }}" hint-placeholder-val="{{ false }}"><div onClick="{{ c.toggle }}" style="cursor:pointer;height:28px;padding:0 10px;border-radius:5px;background:#403C37;display:flex;align-items:center;font-weight:600">{{ c.name }}</div></sc-if>
+<sc-if value="{{ c.inactive }}" hint-placeholder-val="{{ true }}"><div onClick="{{ c.toggle }}" style="cursor:pointer;height:28px;padding:0 10px;border-radius:5px;display:flex;align-items:center;color:#D6D0C6" style-hover="background:#34312D">{{ c.name }}</div></sc-if>
+</sc-for>
+<div style="height:1px;background:#3B3834;margin:10px 4px"></div>
+<div style="padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">WHERE ON CAMPUS</div>
+<sc-for list="{{ places }}" as="p" hint-placeholder-count="6">
+<div onClick="{{ p.toggle }}" style="cursor:pointer;height:28px;padding:0 10px;border-radius:5px;display:flex;align-items:center;gap:9px;color:#D6D0C6" style-hover="background:#34312D">
+<sc-if value="{{ p.on }}" hint-placeholder-val="{{ false }}"><div style="width:13px;height:13px;border-radius:3px;background:#F2EEE7;color:#1F1D1A;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">✓</div></sc-if>
+<sc-if value="{{ p.off }}" hint-placeholder-val="{{ true }}"><div style="width:13px;height:13px;border-radius:3px;border:1px solid #625D56"></div></sc-if>
+<span style="flex:1">{{ p.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">{{ p.count }}</span>
+</div>
+</sc-for>
+</div>
+<div style="flex:1;min-width:0;padding:28px 32px;display:flex;flex-direction:column;gap:18px;overflow:hidden">
+<div style="font-size:30px;font-weight:800;font-variation-settings:'wdth' 118;letter-spacing:-.025em;line-height:1.05"><span style="color:#857F75">Found in</span> {{ filterSummary }}</div>
+<div style="display:flex;align-items:center;gap:6px;border-bottom:1px solid #3B3834;padding-bottom:14px">
+<div style="height:28px;padding:0 10px;border-radius:5px;background:#403C37;display:flex;align-items:center;font-weight:600">This week</div>
+<div style="height:28px;padding:0 10px;display:flex;align-items:center;color:#B0AAA0">Today</div>
+<div style="height:28px;padding:0 10px;display:flex;align-items:center;color:#B0AAA0">This month</div>
+<span style="margin-left:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">{{ countLabel }}</span>
+<div style="flex:1"></div>
+<sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggleSaved }}" style="cursor:pointer;height:28px;padding:0 10px;border:1px solid #4CC27A;color:#4CC27A;border-radius:5px;display:flex;align-items:center;font-weight:600">✓ Alerts on for this search</div></sc-if>
+<sc-if value="{{ notSaved }}" hint-placeholder-val="{{ true }}"><div onClick="{{ toggleSaved }}" style="cursor:pointer;height:28px;padding:0 10px;border:1px solid #58534C;border-radius:5px;display:flex;align-items:center;font-weight:600" style-hover="background:#34312D">Save search &amp; notify me</div></sc-if>
+<div style="height:28px;padding:0 10px;border:1px solid #58534C;border-radius:5px;display:flex;align-items:center;font-weight:600">Newest ▾</div>
+</div>
+<sc-if value="{{ noItems }}" hint-placeholder-val="{{ false }}"><div style="padding:60px 0;display:flex;flex-direction:column;align-items:center;gap:6px;color:#B0AAA0"><span style="font-size:15px;font-weight:700;color:#F2EEE7">No matches yet</span>Save this search and you'll be notified when one is posted.</div></sc-if>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px">
+<sc-for list="{{ items }}" as="item" hint-placeholder-count="8">
+<div style="position:relative;background:#34312D;clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%,0 16px);padding:24px 10px 12px;display:flex;flex-direction:column;gap:10px;cursor:pointer" style-hover="background:#3D3934">
+<div style="position:absolute;top:8px;left:50%;margin-left:-5px;width:10px;height:10px;border-radius:50%;background:#2A2825"></div>
+<div style="height:150px;border-radius:3px;background:repeating-linear-gradient(135deg,#3F3B36 0 7px,#3A3632 7px 14px);display:flex;align-items:center;justify-content:center;position:relative"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A746A">{{ item.photo }}</span>
+<sc-if value="{{ item.isNew }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:7px;left:7px;background:#2A2825;border-radius:4px;padding:2px 6px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:#F2B33D"></span>New</span></sc-if>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:0 2px">
+<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#857F75"><span>Nº {{ item.no }}</span><span>{{ item.when }}</span></div>
+<span style="font-weight:700;font-size:14px;line-height:1.25">{{ item.title }}</span>
+<span style="color:#B0AAA0;font-size:12px">{{ item.place }} · {{ item.held }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">D2 — Listing detail + message the finder</div>
+<div data-screen-label="2 D2 Detail" style="width:1440px;height:900px;background:#24221F;border:1px solid #3B3834;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;font-size:13px">
+<div style="height:48px;flex:none;display:flex;align-items:center;gap:12px;padding:0 16px;background:#2A2825;border-bottom:1px solid #3B3834"><span style="color:#B0AAA0">←</span><span style="color:#B0AAA0">Browse</span><span style="color:#625D56">/</span><span style="color:#B0AAA0">Electronics</span><span style="color:#625D56">/</span><span style="font-weight:600">AirPods Pro case, white</span><div style="flex:1"></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">Nº 0412</span></div>
+<div style="flex:1;display:flex;min-height:0">
+<div style="flex:1;padding:32px;display:flex;flex-direction:column;gap:12px">
+<div style="flex:1;border-radius:6px;background:repeating-linear-gradient(135deg,#2E2B28 0 9px,#2A2825 9px 18px);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#7A746A">main photo</span></div>
+<div style="display:flex;gap:8px"><div style="width:80px;height:56px;border-radius:4px;border:1.5px solid #F2EEE7;background:#2E2B28"></div><div style="width:80px;height:56px;border-radius:4px;background:#2E2B28"></div><div style="width:80px;height:56px;border-radius:4px;background:#2E2B28"></div></div>
+</div>
+<div style="width:390px;flex:none;background:#2A2825;border-left:1px solid #3B3834;display:flex;flex-direction:column">
+<div style="padding:18px 16px;border-bottom:1px solid #3B3834;display:flex;flex-direction:column;gap:8px">
+<span style="align-self:flex-start;font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;background:#34312D;border-radius:4px;padding:2px 7px"><span style="width:6px;height:6px;border-radius:50%;background:#F2B33D"></span>Found · waiting for owner</span>
+<span style="font-size:24px;font-weight:800;font-variation-settings:'wdth' 112;letter-spacing:-.02em;line-height:1.05">AirPods Pro case, white</span>
+<span style="color:#B0AAA0;line-height:1.5">Case only, no earbuds inside. Has a sticker on the back. Tell me what it is.</span>
+</div>
+<div style="padding:12px 16px;border-bottom:1px solid #3B3834;display:grid;grid-template-columns:96px 1fr;row-gap:10px">
+<span style="color:#857F75">Found at</span><span>Library, 2nd floor</span>
+<span style="color:#857F75">When</span><span>Today, 11:30</span>
+<span style="color:#857F75">Now with</span><span>Finder</span>
+</div>
+<div style="padding:12px 16px;border-bottom:1px solid #3B3834;display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#F2B33D;color:#1F1D1A;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">DK</div><div style="flex:1;display:flex;flex-direction:column"><span style="font-weight:600">Daniyar K.</span><span style="color:#857F75;font-size:12px">Returned 4 items before</span></div></div>
+<div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:8px;justify-content:flex-end">
+<div style="align-self:flex-end;max-width:80%;background:#F2EEE7;color:#1F1D1A;padding:8px 11px;border-radius:10px 10px 2px 10px;line-height:1.4">Hi! I think it's mine. The sticker is a small green frog.</div>
+<div style="align-self:flex-start;max-width:80%;background:#3B3834;padding:8px 11px;border-radius:10px 10px 10px 2px;line-height:1.4">That's it. I'm in the library until 16:00.</div>
+</div>
+<div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #3B3834">
+<div style="height:36px;border:1px solid #4A4640;border-radius:6px;display:flex;align-items:center;padding:0 10px;color:#857F75">Write to Daniyar…</div>
+<div style="display:flex;gap:8px"><div style="flex:1;height:32px;border-radius:5px;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;justify-content:center;font-weight:700">Send</div><div style="flex:1;height:32px;border-radius:5px;border:1px solid #58534C;display:flex;align-items:center;justify-content:center;font-weight:600;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#4CC27A"></span>Mark as returned</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">D3 — Post a found item (dialog with live tag preview)</div>
+<div data-screen-label="2 D3 Post" style="width:1440px;height:900px;background:#1B1917;border:1px solid #3B3834;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:13px">
+<div style="width:860px;background:#2A2825;border:1px solid #3B3834;border-radius:10px;box-shadow:0 24px 60px rgba(0,0,0,.5);display:flex;flex-direction:column">
+<div style="height:48px;padding:0 16px;display:flex;align-items:center;border-bottom:1px solid #3B3834"><span style="font-weight:700;flex:1">Post a found item</span><span style="color:#857F75;font-size:16px">×</span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 260px">
+<div style="padding:18px 16px;display:flex;flex-direction:column;gap:12px;border-right:1px solid #3B3834">
+<div style="display:flex;gap:8px"><div style="width:84px;height:84px;border:1px dashed #625D56;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px">+</div><div style="width:84px;height:84px;border-radius:6px;background:#34312D"></div></div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">What is it</span><div style="height:32px;border:1px solid #F2EEE7;border-radius:5px;display:flex;align-items:center;padding:0 10px">AirPods Pro case, white</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">Category</span><div style="height:32px;border:1px solid #4A4640;border-radius:5px;display:flex;align-items:center;justify-content:space-between;padding:0 10px">Electronics <span style="color:#857F75;font-size:10px">▾</span></div></div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">When</span><div style="height:32px;border:1px solid #4A4640;border-radius:5px;display:flex;align-items:center;padding:0 10px">Today, 11:30</div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">Where you found it</span><div style="height:32px;border:1px solid #4A4640;border-radius:5px;display:flex;align-items:center;justify-content:space-between;padding:0 10px">Library · 2nd floor <span style="color:#857F75;font-size:10px">▾</span></div></div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">Description</span><div style="height:60px;border:1px solid #4A4640;border-radius:5px;padding:8px 10px;color:#D6D0C6;line-height:1.45">Case only. Has a sticker on the back.</div><span style="color:#857F75;font-size:12px">Leave one detail out so the real owner can prove it's theirs.</span></div>
+<div style="display:flex;flex-direction:column;gap:6px"><span style="color:#B0AAA0;font-size:12px">Where is it now</span><div style="display:flex;border:1px solid #4A4640;border-radius:5px;padding:2px"><div style="flex:1;height:26px;border-radius:4px;background:#403C37;display:flex;align-items:center;justify-content:center;font-weight:600">With me</div><div style="flex:1;height:26px;display:flex;align-items:center;justify-content:center;color:#B0AAA0">Security desk</div><div style="flex:1;height:26px;display:flex;align-items:center;justify-content:center;color:#B0AAA0">Library desk</div></div></div>
+</div>
+<div style="padding:18px 16px;display:flex;flex-direction:column;gap:10px;background:#24221F">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#857F75">PREVIEW</span>
+<div style="position:relative;background:#34312D;clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%,0 16px);padding:24px 10px 12px;display:flex;flex-direction:column;gap:8px">
+<div style="position:absolute;top:8px;left:50%;margin-left:-5px;width:10px;height:10px;border-radius:50%;background:#24221F"></div>
+<div style="height:130px;border-radius:3px;background:repeating-linear-gradient(135deg,#3F3B36 0 7px,#3A3632 7px 14px)"></div>
+<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#857F75"><span>Nº 0413</span><span>JUST NOW</span></div>
+<span style="font-weight:700;font-size:14px">AirPods Pro case, white</span>
+<span style="color:#B0AAA0;font-size:12px">Library · 2nd floor</span>
+</div>
+</div>
+</div>
+<div style="padding:12px 16px;border-top:1px solid #3B3834;display:flex;align-items:center;gap:8px"><span style="flex:1;color:#B0AAA0;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#F2B33D"></span>3 saved searches match. They'll be notified.</span><div style="height:32px;padding:0 14px;border-radius:5px;border:1px solid #58534C;display:flex;align-items:center;font-weight:600">Cancel</div><div style="height:32px;padding:0 14px;border-radius:5px;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;font-weight:700">Post item</div></div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">D4 — Saved searches + notifications</div>
+<div data-screen-label="2 D4 Alerts" style="width:1440px;height:900px;background:#2A2825;border:1px solid #3B3834;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;font-size:13px">
+<div style="height:48px;flex:none;display:flex;align-items:center;border-bottom:1px solid #3B3834">
+<div style="height:48px;padding:0 18px;display:flex;align-items:center;border-right:1px solid #3B3834;font-weight:800;font-variation-settings:'wdth' 118;font-size:15px">Lost &amp; Found</div>
+<div style="display:flex;gap:26px;padding:0 24px;font-weight:600"><span style="color:#B0AAA0">Browse</span><span>Saved searches</span><span style="color:#B0AAA0">My posts</span><span style="color:#B0AAA0">Chats</span></div>
+<div style="flex:1"></div>
+<div style="margin:0 16px;height:30px;padding:0 12px;border-radius:5px;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;font-weight:700">+ Post found item</div>
+</div>
+<div style="flex:1;display:flex;min-height:0">
+<div style="flex:1;padding:28px 32px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center"><span style="font-size:30px;font-weight:800;font-variation-settings:'wdth' 118;letter-spacing:-.025em;flex:1">Saved searches</span><div style="height:28px;padding:0 10px;border:1px solid #58534C;border-radius:5px;display:flex;align-items:center;font-weight:600">+ New search</div></div>
+<div style="border:1px solid #3B3834;border-radius:6px;overflow:hidden">
+<div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.6fr) 130px 110px 60px;gap:12px;padding:0 14px;height:34px;align-items:center;background:#24221F;color:#857F75;font-family:'IBM Plex Mono',monospace;font-size:11px;border-bottom:1px solid #3B3834"><span>NAME</span><span>FILTERS</span><span>NOTIFY VIA</span><span>MATCHES</span><span>ON</span></div>
+<sc-for list="{{ searches }}" as="s" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.6fr) 130px 110px 60px;gap:12px;padding:0 14px;height:52px;align-items:center;border-bottom:1px solid #3B3834" style-hover="background:#34312D">
+<span style="font-weight:700">{{ s.name }}</span>
+<div style="display:flex;gap:5px;overflow:hidden"><sc-for list="{{ s.tags }}" as="t" hint-placeholder-count="2"><span style="flex:none;background:#3B3834;border-radius:4px;padding:2px 7px;font-size:12px;color:#D6D0C6">{{ t }}</span></sc-for></div>
+<span style="color:#B0AAA0;font-size:12px">{{ s.channel }}</span>
+<sc-if value="{{ s.hasNew }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:#F2B33D"></span>{{ s.matches }}</span></sc-if>
+<sc-if value="{{ s.noNew }}" hint-placeholder-val="{{ true }}"><span style="font-size:12px;color:#857F75">None yet</span></sc-if>
+<div style="width:28px;height:16px;border-radius:8px;background:#F2EEE7;position:relative"><div style="position:absolute;top:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#2A2825"></div></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="width:380px;flex:none;border-left:1px solid #3B3834;display:flex;flex-direction:column">
+<div style="height:44px;padding:0 16px;display:flex;align-items:center;border-bottom:1px solid #3B3834"><span style="font-weight:700;flex:1">Notifications</span><span style="color:#B0AAA0;font-size:12px">Mark all read</span></div>
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:10px;padding:12px 16px;border-bottom:1px solid #3B3834;align-items:start" style-hover="background:#34312D">
+<sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}"><div style="width:7px;height:7px;border-radius:50%;background:#EF5B4C;margin-top:5px"></div></sc-if>
+<sc-if value="{{ n.read }}" hint-placeholder-val="{{ true }}"><div></div></sc-if>
+<div style="display:flex;flex-direction:column;gap:2px"><span style="line-height:1.4">{{ n.title }}</span><span style="color:#857F75;font-size:12px">{{ n.sub }}</span></div>
+<span style="color:#857F75;font-size:11px">{{ n.when }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id="2b" style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:10px;align-items:center"><span style="background:#F2EEE7;color:#1F1D1A;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px">2b</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#857F75">MOBILE · 390 — sign in, browse, detail, chat, post, alerts, profile</span></div>
+<div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+<div data-screen-label="2 M1 Sign in" style="width:390px;height:844px;background:#24221F;border:8px solid #0E0D0C;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;padding:70px 22px 40px;gap:14px;font-size:14px">
+<div style="width:40px;height:50px;background:#F2EEE7;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%,0 10px);display:flex;justify-content:center;padding-top:8px"><div style="width:9px;height:9px;border-radius:50%;background:#24221F"></div></div>
+<div style="font-size:44px;font-weight:850;font-variation-settings:'wdth' 122;letter-spacing:-.03em;line-height:.95;margin-top:10px">Lost &amp;<br>Found<br><span style="color:#857F75">KBTU</span></div>
+<div style="color:#B0AAA0;line-height:1.5">Find what you lost on campus, or post what you found.</div>
+<div style="flex:1"></div>
+<span style="color:#B0AAA0;font-size:12px">University email</span>
+<div style="height:44px;border:1px solid #F2EEE7;border-radius:8px;display:flex;align-items:center;padding:0 12px">a_seitkali<span style="color:#857F75">@kbtu.kz</span></div>
+<div style="height:44px;border-radius:8px;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;justify-content:center;font-weight:700">Continue</div>
+<span style="color:#857F75;font-size:12px;text-align:center">We'll email you a 6-digit code.</span>
+</div>
+
+<div data-screen-label="2 M2 Browse" style="width:390px;height:844px;background:#2A2825;border:8px solid #0E0D0C;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;position:relative;font-size:13px">
+<div style="padding:56px 16px 10px;display:flex;align-items:center;gap:10px"><span style="font-size:26px;font-weight:800;font-variation-settings:'wdth' 118;letter-spacing:-.02em;flex:1">Found items</span><div style="width:36px;height:36px;border-radius:50%;border:1px solid #4A4640;display:flex;align-items:center;justify-content:center;position:relative"><div style="width:10px;height:12px;border:1.5px solid #F2EEE7;border-radius:5px 5px 2px 2px"></div><span style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;border-radius:7px;background:#EF5B4C;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div></div>
+<div style="padding:0 16px"><div style="height:38px;border:1px solid #4A4640;border-radius:19px;display:flex;align-items:center;gap:8px;padding:0 12px;color:#857F75"><div style="width:11px;height:11px;border:1.5px solid #857F75;border-radius:50%"></div>Search found items</div></div>
+<div style="padding:12px 16px;display:flex;gap:6px;overflow:hidden">
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+<sc-if value="{{ c.active }}" hint-placeholder-val="{{ false }}"><div onClick="{{ c.toggle }}" style="flex:none;height:30px;padding:0 11px;border-radius:15px;background:#F2EEE7;color:#1F1D1A;font-weight:700;display:flex;align-items:center">{{ c.name }}</div></sc-if>
+<sc-if value="{{ c.inactive }}" hint-placeholder-val="{{ true }}"><div onClick="{{ c.toggle }}" style="flex:none;height:30px;padding:0 11px;border-radius:15px;background:#3B3834;display:flex;align-items:center;color:#D6D0C6">{{ c.name }}</div></sc-if>
+</sc-for>
+</div>
+<div style="margin:0 16px;padding:0 12px;height:40px;border:1px solid #3B3834;border-radius:8px;display:flex;align-items:center;gap:8px"><span style="flex:1;color:#B0AAA0">Notify me about new matches</span><span onClick="{{ toggleSaved }}" style="cursor:pointer;font-weight:700">{{ saveBtn }}</span></div>
+<div style="padding:14px 16px 100px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<sc-for list="{{ itemsMobile }}" as="item" hint-placeholder-count="4">
+<div style="position:relative;background:#34312D;clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%,0 12px);padding:20px 8px 10px;display:flex;flex-direction:column;gap:7px">
+<div style="position:absolute;top:6px;left:50%;margin-left:-4px;width:8px;height:8px;border-radius:50%;background:#2A2825"></div>
+<div style="height:104px;border-radius:3px;background:repeating-linear-gradient(135deg,#3F3B36 0 7px,#3A3632 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#7A746A">{{ item.photo }}</span></div>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#857F75">Nº {{ item.no }} · {{ item.when }}</span>
+<span style="font-weight:700;line-height:1.25">{{ item.title }}</span>
+<span style="color:#857F75;font-size:11px">{{ item.place }}</span>
+</div>
+</sc-for>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:78px;background:#24221F;border-top:1px solid #3B3834;display:grid;grid-template-columns:repeat(5,1fr);padding-top:10px;font-size:10px;font-weight:600;text-align:center;color:#857F75">
+<span style="color:#F2EEE7">Browse</span><span>Alerts</span><div style="margin:-4px auto 0;width:40px;height:32px;border-radius:8px;background:#F2EEE7;color:#1F1D1A;font-size:20px;display:flex;align-items:center;justify-content:center">+</div><span>Chats</span><span>Me</span>
+</div>
+</div>
+
+<div data-screen-label="2 M3 Detail" style="width:390px;height:844px;background:#2A2825;border:8px solid #0E0D0C;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;position:relative;font-size:13px">
+<div style="height:330px;flex:none;background:repeating-linear-gradient(135deg,#3F3B36 0 9px,#3A3632 9px 18px);position:relative;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A746A">photo</span><div style="position:absolute;top:54px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(36,34,31,.85);display:flex;align-items:center;justify-content:center">←</div><span style="position:absolute;bottom:12px;right:12px;background:rgba(36,34,31,.85);border-radius:4px;padding:2px 7px;font-size:11px">1/3</span></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;background:#34312D;border-radius:4px;padding:2px 7px"><span style="width:6px;height:6px;border-radius:50%;background:#F2B33D"></span>Found · 2h ago</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#857F75">Nº 0412</span></div>
+<span style="font-size:26px;font-weight:800;font-variation-settings:'wdth' 112;letter-spacing:-.02em;line-height:1.05">AirPods Pro case, white</span>
+<span style="color:#B0AAA0;line-height:1.5">Case only. Has a sticker on the back. Tell me what it is.</span>
+<div style="border:1px solid #3B3834;border-radius:8px;display:grid;grid-template-columns:90px 1fr;row-gap:10px;padding:12px"><span style="color:#857F75">Found at</span><span>Library, 2nd floor</span><span style="color:#857F75">Now with</span><span>Daniyar K.</span><span style="color:#857F75">Category</span><span>Electronics</span></div>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;padding:12px 16px 30px;border-top:1px solid #3B3834;background:#2A2825"><div style="height:44px;border-radius:8px;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">This is mine · Message finder</div></div>
+</div>
+
+<div data-screen-label="2 M4 Chat" style="width:390px;height:844px;background:#24221F;border:8px solid #0E0D0C;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;font-size:14px">
+<div style="padding:54px 14px 12px;display:flex;align-items:center;gap:10px;background:#2A2825;border-bottom:1px solid #3B3834"><span>←</span><div style="width:30px;height:30px;border-radius:50%;background:#F2B33D;color:#1F1D1A;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">DK</div><div style="flex:1;display:flex;flex-direction:column"><span style="font-weight:700">Daniyar K.</span><span style="color:#857F75;font-size:11px">AirPods Pro case · Nº 0412</span></div></div>
+<div style="flex:1;padding:16px 14px;display:flex;flex-direction:column;gap:8px;justify-content:flex-end">
+<div style="align-self:flex-end;max-width:78%;background:#F2EEE7;color:#1F1D1A;padding:9px 12px;border-radius:12px 12px 2px 12px;line-height:1.4">Hi! I think that's mine. The sticker is a green frog.</div>
+<div style="align-self:flex-start;max-width:78%;background:#3B3834;padding:9px 12px;border-radius:12px 12px 12px 2px;line-height:1.4">Yes, that's it. Library entrance at 14:40?</div>
+<div style="align-self:flex-end;max-width:78%;background:#F2EEE7;color:#1F1D1A;padding:9px 12px;border-radius:12px 12px 2px 12px;line-height:1.4">Perfect, see you there.</div>
+<div style="align-self:center;margin-top:10px;font-size:12px;color:#B0AAA0;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#4CC27A"></span>Daniyar marked this item as returned</div>
+</div>
+<div style="padding:10px 14px 30px;border-top:1px solid #3B3834;display:flex;gap:8px"><div style="flex:1;height:40px;border:1px solid #4A4640;border-radius:20px;display:flex;align-items:center;padding:0 14px;color:#857F75">Message</div><div style="width:40px;height:40px;border-radius:50%;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;justify-content:center;font-weight:700">↑</div></div>
+</div>
+
+<div data-screen-label="2 M5 Post" style="width:390px;height:844px;background:#2A2825;border:8px solid #0E0D0C;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;position:relative;font-size:14px">
+<div style="padding:54px 16px 12px;display:flex;align-items:center;border-bottom:1px solid #3B3834"><span style="color:#B0AAA0;width:60px">Cancel</span><span style="flex:1;text-align:center;font-weight:700">Post found item</span><span style="width:60px"></span></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;gap:8px"><div style="width:96px;height:96px;border:1px dashed #625D56;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px">+</div><div style="width:96px;height:96px;border-radius:8px;background:#3B3834"></div></div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">What is it</span><div style="height:42px;border:1px solid #F2EEE7;border-radius:8px;display:flex;align-items:center;padding:0 12px">Black umbrella</div></div>
+<div style="display:flex;flex-direction:column;gap:6px"><span style="color:#B0AAA0;font-size:12px">Category</span><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="height:30px;padding:0 11px;border-radius:15px;background:#3B3834;display:flex;align-items:center;font-size:13px">Electronics</span><span style="height:30px;padding:0 11px;border-radius:15px;background:#3B3834;display:flex;align-items:center;font-size:13px">Keys</span><span style="height:30px;padding:0 11px;border-radius:15px;background:#3B3834;display:flex;align-items:center;font-size:13px">Clothing</span><span style="height:30px;padding:0 11px;border-radius:15px;background:#F2EEE7;color:#1F1D1A;font-weight:700;display:flex;align-items:center;font-size:13px">Other</span></div></div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">Where you found it</span><div style="height:42px;border:1px solid #4A4640;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px">Canteen <span style="color:#857F75;font-size:10px">▾</span></div></div>
+<div style="display:flex;flex-direction:column;gap:5px"><span style="color:#B0AAA0;font-size:12px">Where is it now</span><div style="display:flex;border:1px solid #4A4640;border-radius:8px;padding:2px"><div style="flex:1;height:34px;border-radius:6px;background:#403C37;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px">With me</div><div style="flex:1;height:34px;display:flex;align-items:center;justify-content:center;color:#B0AAA0;font-size:13px">At a desk</div></div></div>
+</div>
+<div style="position:absolute;left:16px;right:16px;bottom:30px;height:44px;border-radius:8px;background:#F2EEE7;color:#1F1D1A;display:flex;align-items:center;justify-content:center;font-weight:700">Post item</div>
+</div>
+
+<div data-screen-label="2 M6 Alerts" style="width:390px;height:844px;background:#2A2825;border:8px solid #0E0D0C;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;font-size:13px">
+<div style="padding:56px 16px 12px;font-size:26px;font-weight:800;font-variation-settings:'wdth' 118;letter-spacing:-.02em">Alerts</div>
+<div style="margin:0 16px;display:flex;border:1px solid #4A4640;border-radius:8px;padding:2px"><div style="flex:1;height:30px;border-radius:6px;background:#403C37;display:flex;align-items:center;justify-content:center;font-weight:600">Notifications</div><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;color:#B0AAA0">Saved searches · 3</div></div>
+<div style="padding:8px 0;display:flex;flex-direction:column">
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:10px;padding:13px 16px;border-bottom:1px solid #3B3834;align-items:start">
+<sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}"><div style="width:7px;height:7px;border-radius:50%;background:#EF5B4C;margin-top:5px"></div></sc-if>
+<sc-if value="{{ n.read }}" hint-placeholder-val="{{ true }}"><div></div></sc-if>
+<div style="display:flex;flex-direction:column;gap:2px"><span style="line-height:1.4">{{ n.title }}</span><span style="color:#857F75;font-size:12px">{{ n.sub }}</span></div>
+<span style="color:#857F75;font-size:11px">{{ n.when }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div data-screen-label="2 M7 Profile" style="width:390px;height:844px;background:#2A2825;border:8px solid #0E0D0C;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;font-size:13px">
+<div style="padding:60px 16px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #3B3834"><div style="width:48px;height:48px;border-radius:50%;background:#4CC27A;color:#1F1D1A;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center">A</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Aruzhan S.</span><span style="color:#857F75;font-size:12px">a_seitkali@kbtu.kz</span></div><span style="color:#B0AAA0">Settings</span></div>
+<div style="padding:12px 16px 0;display:flex;gap:18px;font-weight:600;border-bottom:1px solid #3B3834"><span style="border-bottom:1.5px solid #F2EEE7;padding-bottom:10px">Posted by me</span><span style="color:#857F75">Got back</span></div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ myPosts }}" as="m" hint-placeholder-count="3">
+<div style="display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid #3B3834">
+<div style="width:52px;height:52px;flex:none;border-radius:6px;background:repeating-linear-gradient(135deg,#3F3B36 0 6px,#3A3632 6px 12px)"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#857F75">Nº {{ m.no }}</span><span style="font-weight:700">{{ m.title }}</span><span style="color:#857F75;font-size:12px">{{ m.sub }}</span></div>
+<sc-if value="{{ m.returned }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;background:#34312D;border-radius:4px;padding:2px 7px"><span style="width:6px;height:6px;border-radius:50%;background:#4CC27A"></span>Returned</span></sc-if>
+<sc-if value="{{ m.open }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;background:#34312D;border-radius:4px;padding:2px 7px"><span style="width:6px;height:6px;border-radius:50%;background:#F2B33D"></span>Open</span></sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+<section style="padding:80px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:10px;max-width:900px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#5E5A4F">Lost &amp; Found · KBTU · Turn 1</div>
+<div style="font-size:44px;font-weight:800;font-variation-settings:'wdth' 118;letter-spacing:-.02em;line-height:1">Direction: the luggage tag</div>
+<div style="font-size:17px;line-height:1.5;color:#4A463C;text-wrap:pretty">Every listing is a manila tag with a number, a hole punch and a stamp. Ink black, paper white, one stamp red. Wide Archivo for headlines, Plex Mono for the labels you'd write on a tag.</div>
+</div>
+
+<div id="1a" style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;gap:10px;align-items:center"><span style="background:#17160F;color:#F4F1E8;font-family:'IBM Plex Mono',monospace;font-size:12px;padding:4px 9px;border-radius:4px">1a</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5E5A4F">DESKTOP · 1440</span></div>
+<div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">D1 — Browse, filter, save search (chips are clickable)</div>
+<div data-screen-label="D1 Browse" style="width:1440px;background:#F4F1E8;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+<div style="height:76px;padding:0 40px;display:flex;align-items:center;gap:32px;border-bottom:1.5px solid #17160F">
+<div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:24px;font-weight:900;font-variation-settings:'wdth' 125;letter-spacing:-.02em">LOST<span style="color:oklch(0.58 0.2 30)">&amp;</span>FOUND</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">/ KBTU</span></div>
+<div style="display:flex;gap:26px;font-size:15px;font-weight:500"><span style="border-bottom:2px solid #17160F;padding-bottom:3px">Browse</span><span style="color:#5E5A4F">Saved searches</span><span style="color:#5E5A4F">My posts</span></div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500">Alerts<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:oklch(0.58 0.2 30);color:#fff;padding:2px 7px;border-radius:3px">3</span></div>
+<div style="width:40px;height:40px;border-radius:50%;background:#E3D5AC;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">AS</div>
+</div>
+
+<div style="padding:48px 40px 32px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px;align-items:end">
+<div style="font-size:84px;line-height:.92;font-weight:850;font-variation-settings:'wdth' 112;letter-spacing:-.035em">{{ bigCount }} things<br>waiting to go <span style="color:oklch(0.58 0.2 30)">home.</span></div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="height:60px;border:1.5px solid #17160F;background:#FBF9F3;display:flex;align-items:center;padding:0 20px;gap:12px;font-size:17px;color:#7A7568"><span style="font-family:'IBM Plex Mono',monospace;color:#17160F">→</span>What did you lose? “AirPods”, “student ID”…</div>
+<div style="display:flex;gap:12px;align-items:center"><div style="height:52px;padding:0 22px;background:#17160F;color:#F4F1E8;display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px">+ Post something I found</div><span style="font-size:14px;color:#5E5A4F">Takes about a minute.</span></div>
+</div>
+</div>
+
+<div style="padding:0 40px 20px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;color:#5E5A4F;width:92px">WHAT</span>
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="8">
+<sc-if value="{{ c.active }}" hint-placeholder-val="{{ false }}"><div onClick="{{ c.toggle }}" style="cursor:pointer;height:36px;padding:0 14px;background:#17160F;color:#F4F1E8;border:1.5px solid #17160F;font-size:14px;font-weight:600;display:flex;align-items:center">{{ c.name }}</div></sc-if>
+<sc-if value="{{ c.inactive }}" hint-placeholder-val="{{ true }}"><div onClick="{{ c.toggle }}" style="cursor:pointer;height:36px;padding:0 14px;border:1.5px solid #C9C2B0;font-size:14px;font-weight:500;display:flex;align-items:center" style-hover="border-color:#17160F">{{ c.name }}</div></sc-if>
+</sc-for>
+</div>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;color:#5E5A4F;width:92px">WHERE</span>
+<sc-for list="{{ places }}" as="p" hint-placeholder-count="6">
+<sc-if value="{{ p.on }}" hint-placeholder-val="{{ false }}"><div onClick="{{ p.toggle }}" style="cursor:pointer;height:36px;padding:0 14px;background:oklch(0.58 0.2 30);color:#fff;border:1.5px solid oklch(0.58 0.2 30);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">{{ p.name }} <span style="font-family:'IBM Plex Mono',monospace;font-size:11px">×</span></div></sc-if>
+<sc-if value="{{ p.off }}" hint-placeholder-val="{{ true }}"><div onClick="{{ p.toggle }}" style="cursor:pointer;height:36px;padding:0 14px;border:1.5px dashed #B3AB97;font-size:14px;font-weight:500;display:flex;align-items:center" style-hover="border-color:#17160F">{{ p.name }}</div></sc-if>
+</sc-for>
+<div style="flex:1"></div>
+<div style="display:flex;border:1.5px solid #17160F;font-size:14px;font-weight:600"><div style="padding:8px 14px">Today</div><div style="padding:8px 14px;background:#17160F;color:#F4F1E8">This week</div><div style="padding:8px 14px">This month</div></div>
+</div>
+</div>
+
+<div style="margin:0 40px;padding:16px 20px;background:#17160F;color:#F4F1E8;display:flex;align-items:center;gap:20px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:oklch(0.78 0.12 30)">NOT HERE YET?</span>
+<span style="font-size:16px;flex:1">Save <b>{{ filterSummary }}</b> and we'll notify you the moment a matching item is posted.</span>
+<sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggleSaved }}" style="cursor:pointer;height:42px;padding:0 18px;border:1.5px solid #F4F1E8;display:flex;align-items:center;font-weight:700;font-size:15px">✓ Saved · alerts on</div></sc-if>
+<sc-if value="{{ notSaved }}" hint-placeholder-val="{{ true }}"><div onClick="{{ toggleSaved }}" style="cursor:pointer;height:42px;padding:0 18px;background:oklch(0.58 0.2 30);display:flex;align-items:center;font-weight:700;font-size:15px">Save this search</div></sc-if>
+</div>
+
+<div style="padding:28px 40px 56px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5E5A4F"><span>{{ countLabel }}</span><span>SORT: NEWEST ▾</span></div>
+<sc-if value="{{ noItems }}" hint-placeholder-val="{{ false }}"><div style="border:1.5px dashed #B3AB97;padding:56px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center"><div style="font-size:28px;font-weight:800;font-variation-settings:'wdth' 110">Nothing here. Yet.</div><div style="font-size:16px;color:#5E5A4F">Save the search above and you'll hear about it first.</div></div></sc-if>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+<sc-for list="{{ items }}" as="item" hint-placeholder-count="8">
+<div style="position:relative;background:#E9DCB4;clip-path:polygon(22px 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%,0 22px);padding:30px 14px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer" style-hover="background:#E3D4A6">
+<div style="position:absolute;top:10px;left:50%;margin-left:-7px;width:14px;height:14px;border-radius:50%;background:#F4F1E8;box-shadow:inset 0 0 0 2px #C9B783"></div>
+<div style="height:180px;background:repeating-linear-gradient(135deg,#F1E8CF 0 8px,#E6DAB5 8px 16px);display:flex;align-items:center;justify-content:center;position:relative"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8E8064">{{ item.photo }}</span>
+<sc-if value="{{ item.isNew }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:10px;right:10px;transform:rotate(6deg);border:2px solid oklch(0.58 0.2 30);color:oklch(0.58 0.2 30);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;padding:2px 6px;letter-spacing:.08em;background:rgba(244,241,232,.85)">NEW</div></sc-if>
+</div>
+<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.04em;color:#6B5F43"><span>Nº {{ item.no }}</span><span>{{ item.when }}</span></div>
+<div style="font-size:20px;font-weight:750;font-variation-settings:'wdth' 90;line-height:1.1;letter-spacing:-.01em">{{ item.title }}</div>
+<div style="border-top:1.5px dashed #BFAE80;padding-top:10px;display:flex;flex-direction:column;gap:3px;font-size:13px"><span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B5F43">FOUND </span>{{ item.place }}</span><span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B5F43">NOW&nbsp;&nbsp; </span>{{ item.held }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">D2 — Listing detail + message the finder</div>
+<div data-screen-label="D2 Detail" style="width:1440px;height:940px;background:#F4F1E8;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+<div style="height:76px;padding:0 40px;display:flex;align-items:center;gap:32px;border-bottom:1.5px solid #17160F"><span style="font-size:24px;font-weight:900;font-variation-settings:'wdth' 125;letter-spacing:-.02em">LOST<span style="color:oklch(0.58 0.2 30)">&amp;</span>FOUND</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5E5A4F">← Back to all items</span></div>
+<div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 560px;min-height:0">
+<div style="padding:40px;display:flex;flex-direction:column;gap:14px;border-right:1.5px solid #17160F">
+<div style="flex:1;background:repeating-linear-gradient(135deg,#ECE6D6 0 10px,#E2DAC6 10px 20px);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#8E8064">main photo — airpods case on library desk</span></div>
+<div style="display:flex;gap:12px"><div style="width:96px;height:72px;border:2px solid #17160F;background:repeating-linear-gradient(135deg,#ECE6D6 0 6px,#E2DAC6 6px 12px)"></div><div style="width:96px;height:72px;background:repeating-linear-gradient(135deg,#ECE6D6 0 6px,#E2DAC6 6px 12px)"></div><div style="width:96px;height:72px;background:repeating-linear-gradient(135deg,#ECE6D6 0 6px,#E2DAC6 6px 12px)"></div></div>
+</div>
+<div style="padding:40px;display:flex;flex-direction:column;gap:26px;position:relative">
+<div style="position:absolute;top:44px;right:40px;transform:rotate(-8deg);border:3px solid oklch(0.58 0.2 30);color:oklch(0.58 0.2 30);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;padding:6px 12px;letter-spacing:.14em">FOUND</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5E5A4F">Nº 0412 · ELECTRONICS</div>
+<div style="font-size:56px;line-height:.95;font-weight:850;font-variation-settings:'wdth' 108;letter-spacing:-.03em">AirPods Pro case, white</div>
+<div style="display:grid;grid-template-columns:120px 1fr;row-gap:12px;font-size:16px;border-top:1.5px solid #17160F;padding-top:20px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F;padding-top:3px">FOUND AT</span><span>Library, 2nd floor, table near the windows</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F;padding-top:3px">WHEN</span><span>Today, around 11:30</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F;padding-top:3px">NOW WITH</span><span>The finder. Can meet on campus.</span>
+</div>
+<div style="font-size:16px;line-height:1.55;color:#3D3A31;text-wrap:pretty">Case only, no earbuds inside that I could see. Has a small sticker on the back — tell me what it is and it's yours.</div>
+<div style="margin-top:auto;border:1.5px solid #17160F;padding:20px;display:flex;flex-direction:column;gap:16px;background:#FBF9F3">
+<div style="display:flex;align-items:center;gap:14px"><div style="width:48px;height:48px;border-radius:50%;background:#E3D5AC;display:flex;align-items:center;justify-content:center;font-weight:700">DK</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;font-size:17px">Daniyar K.</span><span style="font-size:14px;color:#5E5A4F">Petroleum engineering · 3rd year</span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">REPLIES FAST</span></div>
+<div style="height:52px;background:oklch(0.58 0.2 30);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">This is mine — message Daniyar</div>
+<div style="font-size:13px;color:#5E5A4F;line-height:1.45">Mention something only the owner would know. Your KBTU email stays private.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">D3 — Post a found item</div>
+<div data-screen-label="D3 Post" style="width:1440px;height:940px;background:#F4F1E8;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+<div style="height:76px;padding:0 40px;display:flex;align-items:center;gap:32px;border-bottom:1.5px solid #17160F"><span style="font-size:24px;font-weight:900;font-variation-settings:'wdth' 125;letter-spacing:-.02em">LOST<span style="color:oklch(0.58 0.2 30)">&amp;</span>FOUND</span><div style="flex:1"></div><span style="font-size:15px;font-weight:600">Cancel</span></div>
+<div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 480px;min-height:0">
+<div style="padding:44px 64px;display:flex;flex-direction:column;gap:30px">
+<div style="font-size:56px;line-height:.95;font-weight:850;font-variation-settings:'wdth' 112;letter-spacing:-.03em">You found something.<br>Nice.</div>
+<div style="display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;align-items:start">
+<div style="height:200px;border:1.5px dashed #17160F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center"><span style="font-size:28px">+</span><span style="font-size:14px;font-weight:600">Add photos</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F">up to 4</span></div>
+<div style="display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">WHAT IS IT</span><div style="height:54px;border-bottom:2px solid #17160F;display:flex;align-items:center;font-size:24px;font-weight:600">AirPods Pro case, white</div></div>
+<div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">CATEGORY</span><div style="display:flex;gap:8px;flex-wrap:wrap"><div style="height:36px;padding:0 14px;background:#17160F;color:#F4F1E8;display:flex;align-items:center;font-size:14px;font-weight:600">Electronics</div><div style="height:36px;padding:0 14px;border:1.5px solid #C9C2B0;display:flex;align-items:center;font-size:14px">Cards &amp; IDs</div><div style="height:36px;padding:0 14px;border:1.5px solid #C9C2B0;display:flex;align-items:center;font-size:14px">Keys</div><div style="height:36px;padding:0 14px;border:1.5px solid #C9C2B0;display:flex;align-items:center;font-size:14px">Clothing</div><div style="height:36px;padding:0 14px;border:1.5px solid #C9C2B0;display:flex;align-items:center;font-size:14px">Other</div></div></div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px">
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">WHERE YOU FOUND IT</span><div style="height:54px;border:1.5px solid #17160F;background:#FBF9F3;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:16px">Library · 2nd floor <span>▾</span></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">WHEN</span><div style="height:54px;border:1.5px solid #17160F;background:#FBF9F3;display:flex;align-items:center;padding:0 16px;font-size:16px">Today, 11:30</div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">WHERE IS IT NOW</span><div style="display:flex;gap:12px"><div style="flex:1;border:2px solid #17160F;padding:14px 16px;display:flex;flex-direction:column;gap:2px;background:#FBF9F3"><span style="font-weight:700">I have it with me</span><span style="font-size:14px;color:#5E5A4F">Owner messages you to meet</span></div><div style="flex:1;border:1.5px solid #C9C2B0;padding:14px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-weight:700">I left it at a desk</span><span style="font-size:14px;color:#5E5A4F">Security, library or dean's office</span></div></div></div>
+<div style="font-size:14px;color:#5E5A4F;line-height:1.5;max-width:640px">Tip: leave one detail out of the description (a sticker, what's inside). Ask the owner to name it before you hand it over.</div>
+</div>
+<div style="background:#17160F;padding:44px;display:flex;flex-direction:column;gap:22px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#A8A294">PREVIEW — HOW IT'LL LOOK</span>
+<div style="position:relative;background:#E9DCB4;clip-path:polygon(24px 0,calc(100% - 24px) 0,100% 24px,100% 100%,0 100%,0 24px);padding:34px 18px 20px;display:flex;flex-direction:column;gap:12px">
+<div style="position:absolute;top:12px;left:50%;margin-left:-8px;width:16px;height:16px;border-radius:50%;background:#17160F"></div>
+<div style="height:230px;background:repeating-linear-gradient(135deg,#F1E8CF 0 8px,#E6DAB5 8px 16px);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8E8064">your photo</span></div>
+<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B5F43"><span>Nº 0413</span><span>JUST NOW</span></div>
+<div style="font-size:24px;font-weight:750;font-variation-settings:'wdth' 90;line-height:1.1">AirPods Pro case, white</div>
+<div style="border-top:1.5px dashed #BFAE80;padding-top:10px;font-size:14px">Library · 2nd floor</div>
+</div>
+<div style="font-size:14px;color:#C9C3B4;line-height:1.5">3 people have a saved search that matches this. They'll be notified when you post.</div>
+<div style="margin-top:auto;height:56px;background:oklch(0.58 0.2 30);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px">Post it</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">D4 — Saved searches + notifications</div>
+<div data-screen-label="D4 Alerts" style="width:1440px;height:900px;background:#F4F1E8;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+<div style="height:76px;padding:0 40px;display:flex;align-items:center;gap:32px;border-bottom:1.5px solid #17160F"><span style="font-size:24px;font-weight:900;font-variation-settings:'wdth' 125;letter-spacing:-.02em">LOST<span style="color:oklch(0.58 0.2 30)">&amp;</span>FOUND</span><div style="display:flex;gap:26px;font-size:15px;font-weight:500"><span style="color:#5E5A4F">Browse</span><span style="border-bottom:2px solid #17160F;padding-bottom:3px">Saved searches</span><span style="color:#5E5A4F">My posts</span></div></div>
+<div style="flex:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:0">
+<div style="padding:44px 40px;display:flex;flex-direction:column;gap:24px;border-right:1.5px solid #17160F">
+<div style="display:flex;align-items:flex-end;justify-content:space-between"><div style="font-size:56px;line-height:.95;font-weight:850;font-variation-settings:'wdth' 112;letter-spacing:-.03em">Keeping an eye out</div><span style="font-size:15px;font-weight:600;border-bottom:1.5px solid #17160F">+ New search</span></div>
+<sc-for list="{{ searches }}" as="s" hint-placeholder-count="3">
+<div style="border:1.5px solid #17160F;background:#FBF9F3;padding:20px 22px;display:flex;align-items:center;gap:20px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px"><span style="font-size:20px;font-weight:700">{{ s.name }}</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ s.tags }}" as="t" hint-placeholder-count="2"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;border:1px solid #C9C2B0;padding:3px 8px">{{ t }}</span></sc-for></div></div>
+<sc-if value="{{ s.hasNew }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:oklch(0.58 0.2 30);color:#fff;padding:4px 8px">{{ s.matches }}</span></sc-if>
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div style="width:48px;height:28px;border-radius:14px;background:#17160F;position:relative"><div style="position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#F4F1E8"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F">{{ s.channel }}</span></div>
+</div>
+</sc-for>
+</div>
+<div style="padding:44px 40px;display:flex;flex-direction:column;gap:6px;background:#FBF9F3">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F;margin-bottom:12px">NOTIFICATIONS</div>
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:14px;padding:16px 0;border-bottom:1px solid #DDD6C5;align-items:start">
+<sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}"><div style="width:9px;height:9px;border-radius:50%;background:oklch(0.58 0.2 30);margin-top:7px"></div></sc-if>
+<sc-if value="{{ n.read }}" hint-placeholder-val="{{ true }}"><div></div></sc-if>
+<div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:16px;font-weight:600;line-height:1.35">{{ n.title }}</span><span style="font-size:14px;color:#5E5A4F">{{ n.sub }}</span></div>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F">{{ n.when }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id="1b" style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;gap:10px;align-items:center"><span style="background:#17160F;color:#F4F1E8;font-family:'IBM Plex Mono',monospace;font-size:12px;padding:4px 9px;border-radius:4px">1b</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5E5A4F">MOBILE · 390 — sign in → browse → detail → chat → post → alerts → profile</span></div>
+<div style="display:flex;gap:36px;flex-wrap:wrap;align-items:flex-start">
+
+<div data-screen-label="M1 Sign in" style="width:390px;height:844px;background:#17160F;color:#F4F1E8;border-radius:48px;border:10px solid #17160F;overflow:hidden;display:flex;flex-direction:column;padding:60px 26px 40px;gap:20px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#A8A294">KBTU · ALMATY</span>
+<div style="font-size:92px;line-height:.86;font-weight:900;font-variation-settings:'wdth' 125;letter-spacing:-.04em">LOST<br><span style="color:oklch(0.62 0.2 30)">&amp;</span><br>FOUND</div>
+<div style="font-size:18px;line-height:1.45;color:#C9C3B4;text-wrap:pretty">The university's board for things people found. Get yours back, or help someone else.</div>
+<div style="flex:1"></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#A8A294">UNIVERSITY EMAIL</span><div style="height:56px;border:1.5px solid #F4F1E8;display:flex;align-items:center;padding:0 16px;font-size:17px">a_seitkali<span style="color:#8A8475">@kbtu.kz</span></div></div>
+<div style="height:56px;background:oklch(0.62 0.2 30);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px">Send me a code</div>
+<span style="font-size:13px;color:#8A8475;text-align:center">Only KBTU students and staff can sign in.</span>
+</div>
+
+<div data-screen-label="M2 Browse" style="width:390px;height:844px;background:#F4F1E8;border-radius:48px;border:10px solid #17160F;overflow:hidden;display:flex;flex-direction:column;position:relative">
+<div style="padding:52px 20px 0;display:flex;align-items:center;justify-content:space-between"><span style="font-size:20px;font-weight:900;font-variation-settings:'wdth' 125">LOST<span style="color:oklch(0.58 0.2 30)">&amp;</span>FOUND</span><div style="width:44px;height:44px;border:1.5px solid #17160F;display:flex;align-items:center;justify-content:center;position:relative;font-family:'IBM Plex Mono',monospace;font-size:13px">!<span style="position:absolute;top:-6px;right:-6px;background:oklch(0.58 0.2 30);color:#fff;font-size:10px;padding:1px 5px">3</span></div></div>
+<div style="padding:18px 20px 0;font-size:40px;line-height:.92;font-weight:850;font-variation-settings:'wdth' 108;letter-spacing:-.03em">{{ bigCount }} things<br>waiting.</div>
+<div style="padding:16px 20px 0"><div style="height:50px;border:1.5px solid #17160F;background:#FBF9F3;display:flex;align-items:center;padding:0 14px;gap:10px;font-size:15px;color:#7A7568"><span style="font-family:'IBM Plex Mono',monospace;color:#17160F">→</span>What did you lose?</div></div>
+<div style="padding:12px 20px;display:flex;gap:8px;overflow:hidden">
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+<sc-if value="{{ c.active }}" hint-placeholder-val="{{ false }}"><div onClick="{{ c.toggle }}" style="flex:none;height:36px;padding:0 13px;background:#17160F;color:#F4F1E8;font-size:14px;font-weight:600;display:flex;align-items:center">{{ c.name }}</div></sc-if>
+<sc-if value="{{ c.inactive }}" hint-placeholder-val="{{ true }}"><div onClick="{{ c.toggle }}" style="flex:none;height:36px;padding:0 13px;border:1.5px solid #C9C2B0;font-size:14px;display:flex;align-items:center">{{ c.name }}</div></sc-if>
+</sc-for>
+</div>
+<div style="margin:0 20px;padding:10px 12px;background:#17160F;color:#F4F1E8;display:flex;align-items:center;gap:10px;font-size:13px"><span style="flex:1">Get alerts for <b>{{ filterSummary }}</b></span><span onClick="{{ toggleSaved }}" style="cursor:pointer;background:oklch(0.58 0.2 30);padding:6px 10px;font-weight:700">{{ saveBtn }}</span></div>
+<div style="padding:14px 20px 110px;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow:hidden">
+<sc-for list="{{ itemsMobile }}" as="item" hint-placeholder-count="4">
+<div style="position:relative;background:#E9DCB4;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%,0 14px);padding:22px 9px 10px;display:flex;flex-direction:column;gap:7px">
+<div style="position:absolute;top:7px;left:50%;margin-left:-5px;width:10px;height:10px;border-radius:50%;background:#F4F1E8;box-shadow:inset 0 0 0 1.5px #C9B783"></div>
+<div style="height:104px;background:repeating-linear-gradient(135deg,#F1E8CF 0 7px,#E6DAB5 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8E8064">{{ item.photo }}</span></div>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6B5F43">Nº {{ item.no }} · {{ item.when }}</span>
+<span style="font-size:15px;font-weight:750;font-variation-settings:'wdth' 90;line-height:1.12">{{ item.title }}</span>
+<span style="font-size:12px;border-top:1px dashed #BFAE80;padding-top:6px">{{ item.place }}</span>
+</div>
+</sc-for>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:86px;background:#F4F1E8;border-top:1.5px solid #17160F;display:grid;grid-template-columns:repeat(5,1fr);align-items:start;padding-top:12px;font-size:11px;font-weight:600;text-align:center">
+<span>Browse</span><span style="color:#7A7568">Alerts</span><div style="margin:-30px auto 0;width:58px;height:58px;background:oklch(0.58 0.2 30);color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center">+</div><span style="color:#7A7568">Chats</span><span style="color:#7A7568">Me</span>
+</div>
+</div>
+
+<div data-screen-label="M3 Detail" style="width:390px;height:844px;background:#F4F1E8;border-radius:48px;border:10px solid #17160F;overflow:hidden;display:flex;flex-direction:column;position:relative">
+<div style="height:340px;background:repeating-linear-gradient(135deg,#ECE6D6 0 10px,#E2DAC6 10px 20px);position:relative;display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8E8064">photo of item</span><div style="position:absolute;top:52px;left:18px;width:44px;height:44px;background:#F4F1E8;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600">←</div><span style="position:absolute;bottom:14px;right:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;background:#17160F;color:#F4F1E8;padding:3px 7px">1 / 3</span></div>
+<div style="padding:22px 22px 0;display:flex;flex-direction:column;gap:16px;position:relative">
+<div style="position:absolute;top:18px;right:22px;transform:rotate(-8deg);border:2.5px solid oklch(0.58 0.2 30);color:oklch(0.58 0.2 30);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;padding:4px 9px;letter-spacing:.12em">FOUND</div>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">Nº 0412 · 2H AGO</span>
+<div style="font-size:36px;line-height:.95;font-weight:850;font-variation-settings:'wdth' 106;letter-spacing:-.03em">AirPods Pro case, white</div>
+<div style="display:grid;grid-template-columns:86px 1fr;row-gap:9px;font-size:15px;border-top:1.5px solid #17160F;padding-top:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F;padding-top:3px">FOUND AT</span><span>Library, 2nd floor</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F;padding-top:3px">NOW WITH</span><span>Daniyar K. (finder)</span></div>
+<div style="font-size:15px;line-height:1.5;color:#3D3A31">Case only. Has a sticker on the back — tell me what it is.</div>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;padding:16px 20px 34px;border-top:1.5px solid #17160F;background:#F4F1E8;display:flex;gap:10px"><div style="width:54px;height:54px;border:1.5px solid #17160F;display:flex;align-items:center;justify-content:center;font-size:18px">↗</div><div style="flex:1;height:54px;background:oklch(0.58 0.2 30);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">It's mine — message finder</div></div>
+</div>
+
+<div data-screen-label="M4 Chat" style="width:390px;height:844px;background:#F4F1E8;border-radius:48px;border:10px solid #17160F;overflow:hidden;display:flex;flex-direction:column">
+<div style="padding:52px 18px 14px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid #17160F"><span style="font-size:20px;font-weight:600">←</span><div style="width:40px;height:40px;border-radius:50%;background:#E3D5AC;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">DK</div><div style="flex:1;display:flex;flex-direction:column"><span style="font-weight:700;font-size:16px">Daniyar K.</span><span style="font-size:12px;color:#5E5A4F">Finder</span></div></div>
+<div style="margin:12px 16px 0;background:#E9DCB4;padding:10px 12px;display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px;background:repeating-linear-gradient(135deg,#F1E8CF 0 5px,#E6DAB5 5px 10px)"></div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6B5F43">Nº 0412</span><span style="font-size:14px;font-weight:700">AirPods Pro case, white</span></div></div>
+<div style="flex:1;padding:18px 16px;display:flex;flex-direction:column;gap:10px">
+<div style="align-self:flex-end;max-width:78%;background:#17160F;color:#F4F1E8;padding:11px 14px;font-size:15px;line-height:1.4">Hi! I think that's mine. The sticker is a small green frog 🐸</div>
+<div style="align-self:flex-start;max-width:78%;background:#FBF9F3;border:1.5px solid #DDD6C5;padding:11px 14px;font-size:15px;line-height:1.4">Yep, that's the one. I'm in the library until 16:00.</div>
+<div style="align-self:flex-end;max-width:78%;background:#17160F;color:#F4F1E8;padding:11px 14px;font-size:15px;line-height:1.4">Coming in 10 min!</div>
+<div style="align-self:center;margin-top:8px;border:1.5px dashed #17160F;padding:12px 14px;display:flex;flex-direction:column;gap:3px;text-align:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F">MEETUP</span><span style="font-size:15px;font-weight:700">Library entrance · 14:40</span></div>
+</div>
+<div style="padding:10px 16px 34px;display:flex;flex-direction:column;gap:10px;border-top:1.5px solid #17160F"><div style="height:48px;border:1.5px solid #17160F;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px">✓ Got it back — close listing</div><div style="height:46px;background:#FBF9F3;border:1px solid #C9C2B0;display:flex;align-items:center;padding:0 14px;font-size:15px;color:#7A7568">Message…</div></div>
+</div>
+
+<div data-screen-label="M5 Post" style="width:390px;height:844px;background:#F4F1E8;border-radius:48px;border:10px solid #17160F;overflow:hidden;display:flex;flex-direction:column;position:relative">
+<div style="padding:52px 20px 0;display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:600">Cancel</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E5A4F">STEP 1 / 3</span></div>
+<div style="margin:14px 20px 0;height:4px;background:#DDD6C5"><div style="width:33%;height:4px;background:#17160F"></div></div>
+<div style="padding:24px 20px 0;display:flex;flex-direction:column;gap:22px">
+<div style="font-size:38px;line-height:.95;font-weight:850;font-variation-settings:'wdth' 108;letter-spacing:-.03em">What did you find?</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="height:150px;border:1.5px dashed #17160F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="font-size:26px">+</span><span style="font-size:13px;font-weight:600">Take photo</span></div><div style="height:150px;background:repeating-linear-gradient(135deg,#ECE6D6 0 8px,#E2DAC6 8px 16px);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8E8064">photo 1</span></div></div>
+<div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F">NAME IT</span><div style="height:46px;border-bottom:2px solid #17160F;display:flex;align-items:center;font-size:20px;font-weight:600">Black umbrella</div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E5A4F">CATEGORY</span><div style="display:flex;gap:8px;flex-wrap:wrap"><div style="height:36px;padding:0 12px;border:1.5px solid #C9C2B0;display:flex;align-items:center;font-size:14px">Electronics</div><div style="height:36px;padding:0 12px;border:1.5px solid #C9C2B0;display:flex;align-items:center;font-size:14px">Keys</div><div style="height:36px;padding:0 12px;border:1.5px solid #C9C2B0;display:flex;align-items:center;font-size:14px">Clothing</div><div style="height:36px;padding:0 12px;background:#17160F;color:#F4F1E8;display:flex;align-items:center;font-size:14px;font-weight:600">Other</div></div></div>
+</div>
+<div style="position:absolute;left:20px;right:20px;bottom:34px;height:56px;background:#17160F;color:#F4F1E8;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Next: where &amp; when →</div>
+</div>
+
+<div data-screen-label="M6 Alerts" style="width:390px;height:844px;background:#F4F1E8;border-radius:48px;border:10px solid #17160F;overflow:hidden;display:flex;flex-direction:column">
+<div style="padding:52px 20px 0;font-size:38px;line-height:.95;font-weight:850;font-variation-settings:'wdth' 108;letter-spacing:-.03em">Alerts</div>
+<div style="margin:18px 20px 0;display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #17160F;font-size:14px;font-weight:600;text-align:center"><div style="padding:10px 0;background:#17160F;color:#F4F1E8">Notifications</div><div style="padding:10px 0">Saved searches · 3</div></div>
+<div style="padding:8px 20px;display:flex;flex-direction:column">
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:10px minmax(0,1fr);gap:12px;padding:16px 0;border-bottom:1px solid #DDD6C5">
+<sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}"><div style="width:8px;height:8px;border-radius:50%;background:oklch(0.58 0.2 30);margin-top:7px"></div></sc-if>
+<sc-if value="{{ n.read }}" hint-placeholder-val="{{ true }}"><div></div></sc-if>
+<div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600;line-height:1.35">{{ n.title }}</span><span style="font-size:13px;color:#5E5A4F">{{ n.sub }} · {{ n.when }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div data-screen-label="M7 Profile" style="width:390px;height:844px;background:#F4F1E8;border-radius:48px;border:10px solid #17160F;overflow:hidden;display:flex;flex-direction:column">
+<div style="padding:52px 20px 20px;display:flex;align-items:center;gap:14px;border-bottom:1.5px solid #17160F"><div style="width:60px;height:60px;border-radius:50%;background:#E3D5AC;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px">AS</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;font-weight:750">Aruzhan S.</span><span style="font-size:13px;color:#5E5A4F">a_seitkali@kbtu.kz</span></div><span style="font-size:14px;font-weight:600">Edit</span></div>
+<div style="padding:18px 20px 0;display:flex;gap:22px;font-size:15px;font-weight:600"><span style="border-bottom:2px solid #17160F;padding-bottom:6px">I found</span><span style="color:#7A7568">I got back</span></div>
+<div style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ myPosts }}" as="m" hint-placeholder-count="3">
+<div style="background:#E9DCB4;padding:12px;display:flex;gap:12px;align-items:center;position:relative">
+<div style="width:64px;height:64px;flex:none;background:repeating-linear-gradient(135deg,#F1E8CF 0 6px,#E6DAB5 6px 12px)"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6B5F43">Nº {{ m.no }} · {{ m.when }}</span><span style="font-size:16px;font-weight:700;line-height:1.15">{{ m.title }}</span><span style="font-size:12px;color:#5E5A4F">{{ m.sub }}</span></div>
+<sc-if value="{{ m.returned }}" hint-placeholder-val="{{ false }}"><span style="transform:rotate(-8deg);border:2px solid #2F6B45;color:#2F6B45;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:10px;padding:2px 5px;letter-spacing:.08em">RETURNED</span></sc-if>
+<sc-if value="{{ m.open }}" hint-placeholder-val="{{ true }}"><span style="border:2px solid oklch(0.58 0.2 30);color:oklch(0.58 0.2 30);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:10px;padding:2px 5px;letter-spacing:.08em">OPEN</span></sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { cat: 'All', places: [], saved: false };
+  renderVals() {
+    const ITEMS = [
+      { no: '0412', title: 'AirPods Pro case, white', cat: 'Electronics', place: 'Library · 2nd floor', held: 'With finder', when: '2H AGO', isNew: true, photo: 'airpods case' },
+      { no: '0411', title: 'Student ID — Nurlan S.', cat: 'Cards & IDs', place: 'Main building · Tole bi entrance', held: 'Security desk', when: '5H AGO', isNew: true, photo: 'id card' },
+      { no: '0409', title: 'Black umbrella, wooden handle', cat: 'Other', place: 'Canteen', held: 'With finder', when: 'YESTERDAY', photo: 'umbrella' },
+      { no: '0408', title: 'Keys on a red lanyard', cat: 'Keys', place: 'Main building · Room 304', held: "Dean's office", when: 'YESTERDAY', photo: 'keys' },
+      { no: '0405', title: 'Casio fx-991EX calculator', cat: 'Electronics', place: 'Lab block · 5th floor', held: 'With finder', when: '2 DAYS', photo: 'calculator' },
+      { no: '0403', title: 'Grey hoodie, size M', cat: 'Clothing', place: 'Sports hall', held: 'Sports hall desk', when: '3 DAYS', photo: 'hoodie' },
+      { no: '0401', title: 'Blue Hydro Flask with stickers', cat: 'Bottles', place: 'Library · reading hall', held: 'Library desk', when: '4 DAYS', photo: 'water bottle' },
+      { no: '0398', title: 'Notebook, ML lecture notes', cat: 'Books & notes', place: 'Main building · Room 212', held: 'With finder', when: '5 DAYS', photo: 'notebook' }
+    ];
+    const CATS = ['All', 'Electronics', 'Cards & IDs', 'Keys', 'Clothing', 'Bottles', 'Books & notes', 'Other'];
+    const PLACES = ['Main building', 'Library', 'Canteen', 'Lab block', 'Sports hall', 'Dorms'];
+    const { cat, places, saved } = this.state;
+    const filtered = ITEMS.filter(i => (cat === 'All' || i.cat === cat) && (!places.length || places.some(p => i.place.startsWith(p))));
+    const summary = [cat === 'All' ? 'anything' : cat, places.length ? places.join(', ') : 'all of campus'].join(' · ');
+    return {
+      bigCount: 128,
+      cats: CATS.map(n => ({ name: n, active: n === cat, inactive: n !== cat, toggle: () => this.setState({ cat: n, saved: false }) })),
+      places: PLACES.map(n => {
+        const on = places.includes(n);
+        return { name: n, on, off: !on, count: ITEMS.filter(i => i.place.startsWith(n)).length,
+          toggle: () => this.setState(s => ({ saved: false, places: on ? s.places.filter(x => x !== n) : [...s.places, n] })) };
+      }),
+      items: filtered,
+      itemsMobile: filtered.slice(0, 4),
+      noItems: filtered.length === 0,
+      countLabel: `${filtered.length} ITEM${filtered.length === 1 ? '' : 'S'} · THIS WEEK`,
+      filterSummary: summary,
+      saved, notSaved: !saved,
+      saveBtn: saved ? '✓ Saved' : 'Save',
+      toggleSaved: () => this.setState(s => ({ saved: !s.saved })),
+      searches: [
+        { name: 'My AirPods', tags: ['Electronics', 'Library', '“airpods”'], hasNew: true, matches: '1 NEW MATCH', channel: 'PUSH + EMAIL' },
+        { name: 'Black wallet', tags: ['Cards & IDs', 'Anywhere', '“wallet”'], hasNew: false, matches: '', channel: 'PUSH' },
+        { name: 'Dorm keys', tags: ['Keys', 'Dorms', 'Main building'], hasNew: true, matches: '2 NEW', channel: 'EMAIL' }
+      ].map(s => ({ ...s, noNew: !s.hasNew })),
+      notifs: [
+        { unread: true, read: false, title: 'New match for “My AirPods”: AirPods Pro case, white', sub: 'Library · 2nd floor', when: '2H' },
+        { unread: true, read: false, title: 'Daniyar replied to your message', sub: 'AirPods Pro case', when: '1H' },
+        { unread: true, read: false, title: '2 new keys posted near the dorms', sub: 'Dorm keys', when: '6H' },
+        { unread: false, read: true, title: 'Someone thanked you for returning a student ID', sub: 'Nº 0371', when: '3D' }
+      ],
+      myPosts: [
+        { no: '0409', title: 'Black umbrella', sub: '2 people messaged', when: 'YESTERDAY', returned: false, open: true },
+        { no: '0371', title: 'Student ID — Madina T.', sub: 'Returned in 3 hours', when: 'SEP 21', returned: true, open: false },
+        { no: '0342', title: 'Lenovo charger', sub: 'Returned in 1 day', when: 'SEP 12', returned: true, open: false }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+// Design tokens from docs/design/README.md ("warm workspace").
+//
+// They live as CSS custom properties (var(--x)) so every component can use
+// them at runtime, and a future light theme only has to redefine this block.
+// SCSS variables ($x) would disappear at build time and couldn't be themed.
+
+:root {
+  // Surfaces: warm charcoal, never cold/blue grey
+  --bg-deep: #1b1917;
+  --bg-sunken: #24221f;
+  --bg: #2a2825;
+  --surface: #34312d;
+  --surface-hover: #3d3934;
+  --surface-active: #403c37;
+
+  // Borders
+  --border: #3b3834;
+  --border-input: #4a4640;
+  --border-button: #58534c;
+  --border-strong: #625d56;
+
+  // Striped photo placeholder
+  --placeholder-a: #3f3b36;
+  --placeholder-b: #3a3632;
+
+  // Text
+  --text: #f2eee7;
+  --text-2: #d6d0c6;
+  --text-3: #b0aaa0;
+  --text-4: #857f75;
+  --text-on-light: #1f1d1a;
+
+  // Status: the only place colour is allowed
+  --status-new: #f2b33d;
+  --status-returned: #4cc27a;
+  --status-unread: #ef5b4c;
+
+  // Type
+  --font-ui: 'Archivo', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  // Radii (desktop values; mobile overrides below)
+  --radius-control: 5px;
+  --radius-badge: 4px;
+  --radius-chip: 15px;
+  --radius-modal: 10px;
+
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --transition-hover: background-color 120ms ease;
+
+  // Layout
+  --topbar-height: 48px;
+  --tabbar-height: 78px;
+}
+
+@media (max-width: 1023.98px) {
+  :root {
+    --radius-control: 8px;
+  }
+}

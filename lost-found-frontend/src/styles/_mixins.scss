@@ -1,0 +1,73 @@
+// Reusable SCSS mixins. Components pull them in with `@use 'mixins' as *;`
+// (the `styles` folder is on the include path, see angular.json).
+
+// One breakpoint for the whole app: >= 1024px is the desktop layout (D1-D4),
+// below it is the mobile layout (M1-M7) with a bottom tab bar.
+$desktop: 1024px;
+
+@mixin mobile {
+  @media (max-width: ($desktop - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $desktop) {
+    @content;
+  }
+}
+
+// Small mono caption: item numbers, timestamps, section labels.
+@mixin mono($size: 10px) {
+  font-family: var(--font-mono);
+  font-size: $size;
+  color: var(--text-4);
+  letter-spacing: 0.02em;
+}
+
+@mixin section-label {
+  @include mono(10px);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+// Wide Archivo headline ("wdth" is the variable font's width axis).
+@mixin headline($size, $width: 118, $weight: 800, $tracking: -0.025em) {
+  font-size: $size;
+  font-weight: $weight;
+  font-variation-settings: 'wdth' $width;
+  letter-spacing: $tracking;
+  line-height: 1.05;
+}
+
+// The signature luggage-tag silhouette: top corners notched.
+@mixin tag-shape($notch: 16px) {
+  clip-path: polygon($notch 0, calc(100% - #{$notch}) 0, 100% $notch, 100% 100%, 0 100%, 0 $notch);
+}
+
+@mixin striped-placeholder {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--placeholder-a) 0 7px,
+    var(--placeholder-b) 7px 14px
+  );
+}
+
+@mixin reset-button {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

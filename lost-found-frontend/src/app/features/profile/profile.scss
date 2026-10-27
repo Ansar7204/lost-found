@@ -1,0 +1,168 @@
+@use 'mixins' as *;
+
+:host {
+  display: block;
+  max-width: 760px;
+  padding: 28px 32px;
+
+  @include mobile {
+    padding: 40px 16px 16px;
+  }
+}
+
+.me {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-size: 20px;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 112;
+}
+
+.email {
+  color: var(--text-4);
+}
+
+.settings-btn {
+  @include reset-button;
+  color: var(--text-3);
+
+  &:hover,
+  &[aria-expanded='true'] {
+    color: var(--text);
+  }
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-sunken);
+
+  .label {
+    @include section-label;
+  }
+
+  .hint {
+    color: var(--text-3);
+    font-size: 12px;
+  }
+}
+
+.users,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.user {
+  @include reset-button;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px 0 6px;
+  border: 1px solid var(--border-button);
+  border-radius: 18px;
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background: var(--surface);
+  }
+
+  &.active {
+    border-color: var(--status-returned);
+    cursor: default;
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: 18px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+
+  button {
+    @include reset-button;
+    height: 38px;
+    border-bottom: 1.5px solid transparent;
+    color: var(--text-4);
+    font-weight: 700;
+
+    &.active {
+      border-bottom-color: var(--text);
+      color: var(--text);
+    }
+  }
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition-hover);
+
+  &:hover {
+    background: var(--surface);
+  }
+}
+
+.thumb {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sub {
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.empty {
+  padding: 40px 0;
+  color: var(--text-3);
+  text-align: center;
+
+  a {
+    color: var(--text);
+    text-decoration: underline;
+  }
+}

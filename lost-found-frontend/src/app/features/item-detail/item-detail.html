@@ -1,0 +1,122 @@
+@if (item(); as item) {
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a routerLink="/">← Browse</a>
+    <span class="sep">/</span>
+    <a routerLink="/" [queryParams]="{ cat: item.category }">{{ item.category }}</a>
+    <span class="sep">/</span>
+    <span class="current">{{ item.title }}</span>
+    <span class="mono no">Nº {{ item.no }}</span>
+  </nav>
+
+  <div class="layout">
+    <!-- Photos -->
+    <section class="gallery" aria-label="Photos">
+      <div class="main-photo">
+        <app-photo
+          [src]="item.photos[photoIndex()]"
+          [caption]="item.photoCaption ?? 'photo'"
+          [alt]="item.title"
+        />
+        <button type="button" class="back" aria-label="Back" (click)="back()">←</button>
+        <span class="counter">{{ photoIndex() + 1 }}/{{ photoCount() }}</span>
+      </div>
+      @if (item.photos.length > 1) {
+        <div class="thumbs">
+          @for (photo of item.photos; track $index) {
+            <button
+              type="button"
+              [class.selected]="$index === photoIndex()"
+              [attr.aria-label]="'Photo ' + ($index + 1)"
+              (click)="photoIndex.set($index)"
+            >
+              <app-photo [src]="photo" />
+            </button>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Info + chat -->
+    <aside class="panel">
+      <section class="section intro">
+        <div class="status-row">
+          @if (isOpen()) {
+            <span class="pill pill--new">
+              <span class="d-only">Found · waiting for owner</span>
+              <span class="m-only">Found · {{ item.foundAt | timeAgo | lowercase }}</span>
+            </span>
+          } @else {
+            <span class="pill pill--returned">Returned</span>
+          }
+          <span class="mono m-only">Nº {{ item.no }}</span>
+        </div>
+        <h1 class="title">{{ item.title }}</h1>
+        @if (item.description) {
+          <p class="description">{{ item.description }}</p>
+        }
+      </section>
+
+      <section class="section">
+        <dl class="kv">
+          <dt>Found at</dt>
+          <dd>{{ place() }}</dd>
+          <dt>When</dt>
+          <dd>{{ item.foundAt | when }}</dd>
+          <dt>Now with</dt>
+          <dd>{{ item.held === 'With finder' ? (finder()?.name ?? 'Finder') : item.held }}</dd>
+          <dt>Category</dt>
+          <dd>{{ item.category }}</dd>
+        </dl>
+      </section>
+
+      @if (finder(); as finder) {
+        <section class="section finder">
+          <app-avatar [initials]="finder.initials" [tone]="isFinder() ? 'green' : 'amber'" />
+          <div>
+            <p class="finder-name">{{ isFinder() ? 'You found this' : finder.name }}</p>
+            <p class="muted">Returned {{ finder.returnedCount }} items before</p>
+          </div>
+        </section>
+      }
+
+      <!-- Chat (desktop panel, D2) -->
+      @if (me(); as me) {
+        <app-chat-thread
+          class="chat"
+          [messages]="thread()?.messages ?? []"
+          [meId]="me.id"
+          [canWrite]="isOpen() && (!isFinder() || !!thread())"
+          [placeholder]="'Write to ' + (otherPerson()?.name ?? 'the finder') + '…'"
+          [emptyText]="
+            isFinder()
+              ? 'No messages yet. People who think it’s theirs will write here.'
+              : 'Is it yours? Tell the finder something only the owner would know.'
+          "
+          [actionLabel]="isFinder() && isOpen() ? 'Mark as returned' : null"
+          (send)="send($event)"
+          (action)="markReturned()"
+        />
+      }
+    </aside>
+  </div>
+
+  <!-- Mobile sticky CTA (M3) -->
+  <div class="cta">
+    @if (!isOpen()) {
+      <button type="button" class="btn btn--secondary btn--block" disabled>Returned</button>
+    } @else if (isFinder()) {
+      <button type="button" class="btn btn--secondary btn--block" (click)="markReturned()">
+        Mark as returned
+      </button>
+    } @else {
+      <button type="button" class="btn btn--primary btn--block" (click)="messageFinder()">
+        This is mine · Message finder
+      </button>
+    }
+  </div>
+} @else {
+  <div class="missing">
+    <p class="missing-title">Nº {{ no() }} doesn't exist</p>
+    <a class="btn btn--secondary" routerLink="/">← Back to Browse</a>
+  </div>
+}

@@ -1,0 +1,38 @@
+{
+  "users": [
+    { "id": "u1", "name": "Aruzhan S.", "email": "a_seitkali@kbtu.kz", "initials": "A", "returnedCount": 2 },
+    { "id": "u2", "name": "Daniyar K.", "email": "d_kassym@kbtu.kz", "initials": "DK", "returnedCount": 4 }
+  ],
+  "categories": ["All", "Electronics", "Cards & IDs", "Keys", "Clothing", "Bottles", "Books & notes", "Other"],
+  "places": ["Main building", "Library", "Canteen", "Lab block", "Sports hall", "Dorms"],
+  "items": [
+    { "no": "0412", "title": "AirPods Pro case, white", "category": "Electronics", "place": "Library", "placeDetail": "2nd floor", "held": "With finder", "foundAt": "-2h", "description": "Case only, no earbuds inside. Has a sticker on the back. Tell me what it is.", "photoCaption": "airpods case", "finderId": "u2", "status": "open" },
+    { "no": "0411", "title": "Student ID — Nurlan S.", "category": "Cards & IDs", "place": "Main building", "placeDetail": "Tole bi entrance", "held": "Security desk", "foundAt": "-5h", "description": "", "photoCaption": "id card", "finderId": "u2", "status": "open" },
+    { "no": "0409", "title": "Black umbrella, wooden handle", "category": "Other", "place": "Canteen", "held": "With finder", "foundAt": "-1d", "description": "", "photoCaption": "umbrella", "finderId": "u1", "status": "open" },
+    { "no": "0408", "title": "Keys on a red lanyard", "category": "Keys", "place": "Main building", "placeDetail": "Room 304", "held": "Dean's office", "foundAt": "-1d", "description": "", "photoCaption": "keys", "finderId": "u2", "status": "open" },
+    { "no": "0405", "title": "Casio fx-991EX calculator", "category": "Electronics", "place": "Lab block", "placeDetail": "5th floor", "held": "With finder", "foundAt": "-2d", "description": "", "photoCaption": "calculator", "finderId": "u2", "status": "open" },
+    { "no": "0403", "title": "Grey hoodie, size M", "category": "Clothing", "place": "Sports hall", "held": "Sports hall desk", "foundAt": "-3d", "description": "", "photoCaption": "hoodie", "finderId": "u2", "status": "open" },
+    { "no": "0401", "title": "Blue Hydro Flask with stickers", "category": "Bottles", "place": "Library", "placeDetail": "reading hall", "held": "Library desk", "foundAt": "-4d", "description": "", "photoCaption": "water bottle", "finderId": "u2", "status": "open" },
+    { "no": "0398", "title": "Notebook, ML lecture notes", "category": "Books & notes", "place": "Main building", "placeDetail": "Room 212", "held": "With finder", "foundAt": "-5d", "description": "", "photoCaption": "notebook", "finderId": "u2", "status": "open" },
+    { "no": "0371", "title": "Student ID — Madina T.", "category": "Cards & IDs", "place": "Main building", "held": "With finder", "foundAt": "2026-09-21", "description": "", "photoCaption": "id card", "finderId": "u1", "status": "returned" },
+    { "no": "0342", "title": "Lenovo charger", "category": "Electronics", "place": "Lab block", "held": "With finder", "foundAt": "2026-09-12", "description": "", "photoCaption": "charger", "finderId": "u1", "status": "returned" }
+  ],
+  "savedSearches": [
+    { "id": "s1", "userId": "u1", "name": "My AirPods", "category": "Electronics", "places": ["Library"], "query": "airpods", "channel": "PUSH + EMAIL", "on": true, "newMatches": 1 },
+    { "id": "s2", "userId": "u1", "name": "Black wallet", "category": "Cards & IDs", "places": [], "query": "wallet", "channel": "PUSH", "on": true, "newMatches": 0 },
+    { "id": "s3", "userId": "u1", "name": "Dorm keys", "category": "Keys", "places": ["Dorms", "Main building"], "channel": "EMAIL", "on": true, "newMatches": 2 }
+  ],
+  "notifications": [
+    { "id": "n1", "userId": "u1", "title": "New match for “My AirPods”: AirPods Pro case, white", "sub": "Library · 2nd floor", "createdAt": "-2h", "read": false, "link": "/item/0412" },
+    { "id": "n2", "userId": "u1", "title": "Daniyar replied to your message", "sub": "AirPods Pro case", "createdAt": "-1h", "read": false, "link": "/chats/t1" },
+    { "id": "n3", "userId": "u1", "title": "2 new keys posted near the dorms", "sub": "Dorm keys", "createdAt": "-6h", "read": false, "link": "/alerts" },
+    { "id": "n4", "userId": "u1", "title": "Someone thanked you for returning a student ID", "sub": "Nº 0371", "createdAt": "-3d", "read": true, "link": "/item/0371" }
+  ],
+  "threads": [
+    { "id": "t1", "itemNo": "0412", "participants": ["u1", "u2"], "messages": [
+      { "from": "u1", "text": "Hi! I think it's mine. The sticker is a small green frog.", "at": "-70m" },
+      { "from": "u2", "text": "That's it. I'm in the library until 16:00.", "at": "-60m" }
+    ] }
+  ],
+  "_note": "foundAt/createdAt values like '-2h' are offsets from now; convert to ISO when seeding."
+}

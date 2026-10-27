@@ -1,0 +1,96 @@
+@if (auth.currentUser(); as me) {
+  <header class="me">
+    <app-avatar [initials]="me.initials" [size]="48" />
+    <div class="who">
+      <h1 class="name">{{ me.name }}</h1>
+      <p class="email">{{ me.email }}</p>
+    </div>
+    <button
+      type="button"
+      class="settings-btn"
+      [attr.aria-expanded]="settingsOpen()"
+      (click)="settingsOpen.set(!settingsOpen())"
+    >
+      Settings
+    </button>
+  </header>
+
+  @if (settingsOpen()) {
+    <section class="settings" aria-label="Settings">
+      <p class="label">Demo · switch user</p>
+      <p class="hint">
+        Post as one student, get the alert as another. Tip: open a second tab and sign in as the
+        other user; both tabs update live.
+      </p>
+      <div class="users">
+        @for (u of auth.users(); track u.id) {
+          <button
+            type="button"
+            class="user"
+            [class.active]="u.id === me.id"
+            [disabled]="u.id === me.id"
+            (click)="switchUser(u.id)"
+          >
+            <app-avatar [initials]="u.initials" [size]="24" />
+            {{ u.name }}
+          </button>
+        }
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn--secondary" (click)="resetDemo()">
+          Reset demo data
+        </button>
+        <button type="button" class="btn btn--secondary" (click)="signOut()">Sign out</button>
+      </div>
+    </section>
+  }
+
+  <nav class="tabs" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="tab() === 'posted'"
+      [class.active]="tab() === 'posted'"
+      (click)="tab.set('posted')"
+    >
+      Posted by me
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="tab() === 'gotBack'"
+      [class.active]="tab() === 'gotBack'"
+      (click)="tab.set('gotBack')"
+    >
+      Got back
+    </button>
+  </nav>
+
+  <ul class="list" role="tabpanel">
+    @for (item of list(); track item.no) {
+      <li>
+        <a class="row" [routerLink]="['/item', item.no]">
+          <app-photo class="thumb" [src]="item.photos[0]" />
+          <div class="text">
+            <span class="mono">Nº {{ item.no }} · {{ item.foundAt | timeAgo }}</span>
+            <span class="title">{{ item.title }}</span>
+            <span class="sub">{{ subtitle(item) }}</span>
+          </div>
+          @if (item.status === 'returned') {
+            <span class="pill pill--returned">Returned</span>
+          } @else {
+            <span class="pill pill--new">Open</span>
+          }
+        </a>
+      </li>
+    } @empty {
+      <li class="empty">
+        @if (tab() === 'posted') {
+          You haven't posted anything yet. <a routerLink="/post">Post a found item</a>
+        } @else {
+          Nothing returned to you yet.
+        }
+      </li>
+    }
+  </ul>
+}

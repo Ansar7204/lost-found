@@ -1,0 +1,122 @@
+<aside class="sidebar" aria-label="Filters">
+  <h2 class="label">Category</h2>
+  <ul class="list">
+    @for (c of categories; track c) {
+      <li>
+        <button
+          type="button"
+          class="row"
+          [class.active]="c === category()"
+          [attr.aria-pressed]="c === category()"
+          (click)="setCategory(c)"
+        >
+          {{ c }}
+        </button>
+      </li>
+    }
+  </ul>
+
+  <hr />
+
+  <h2 class="label">Where on campus</h2>
+  <ul class="list">
+    @for (p of allPlaces; track p) {
+      <li>
+        <label class="row check">
+          <input
+            type="checkbox"
+            [checked]="selectedPlaces().includes(p)"
+            (change)="togglePlace(p)"
+          />
+          <span class="box" aria-hidden="true"></span>
+          <span class="name">{{ p }}</span>
+          <span class="count">{{ placeCounts().get(p) ?? 0 }}</span>
+        </label>
+      </li>
+    }
+  </ul>
+</aside>
+
+<section class="main">
+  <!-- Mobile header (M2) -->
+  <header class="m-header">
+    <h1 class="m-title">Found items</h1>
+    <a class="bell" routerLink="/alerts" aria-label="Alerts">
+      <span class="bell-icon" aria-hidden="true"></span>
+      @if (alerts.unreadCount()) {
+        <span class="count-badge">{{ alerts.unreadCount() }}</span>
+      }
+    </a>
+  </header>
+
+  <label class="m-search">
+    <span class="visually-hidden">Search found items</span>
+    <input
+      #box
+      type="search"
+      placeholder="Search found items"
+      [value]="q() ?? ''"
+      (input)="setQuery(box.value)"
+    />
+  </label>
+
+  <div class="chips" role="group" aria-label="Category">
+    @for (c of categories; track c) {
+      <button
+        type="button"
+        class="chip"
+        [class.active]="c === category()"
+        [attr.aria-pressed]="c === category()"
+        (click)="setCategory(c)"
+      >
+        {{ c }}
+      </button>
+    }
+  </div>
+
+  <div class="m-notify">
+    <span>Notify me about new matches</span>
+    <button type="button" [class.on]="isSaved()" (click)="toggleSaved()">
+      {{ isSaved() ? '✓ Saved' : 'Save' }}
+    </button>
+  </div>
+
+  <!-- Desktop header (D1) -->
+  <h1 class="title"><span class="muted-title">Found in</span> {{ title() }}</h1>
+
+  <div class="toolbar">
+    <app-segmented [options]="ranges" [value]="timeRange()" (valueChange)="setRange($event)" />
+    <span class="mono count-label">{{ countLabel() }}</span>
+    <span class="spacer"></span>
+    <button
+      type="button"
+      class="btn"
+      [class.btn--secondary]="!isSaved()"
+      [class.btn--success]="isSaved()"
+      (click)="toggleSaved()"
+    >
+      {{ isSaved() ? '✓ Alerts on for this search' : 'Save search & notify me' }}
+    </button>
+    <button type="button" class="btn btn--secondary" (click)="toggleSort()">
+      {{ sortOrder() === 'newest' ? 'Newest' : 'Oldest' }} ▾
+    </button>
+  </div>
+
+  @if (visibleItems().length) {
+    <ul class="grid">
+      @for (item of visibleItems(); track item.no) {
+        <li>
+          <a [routerLink]="['/item', item.no]"><app-tag-card [item]="item" /></a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="empty">
+      <p class="empty-title">No matches yet</p>
+      <p>Save this search and you'll be notified when one is posted.</p>
+    </div>
+  }
+</section>
+
+<!-- Child route: /post opens the modal on top of this page. -->
+<router-outlet />
