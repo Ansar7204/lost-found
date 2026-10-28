@@ -2,7 +2,7 @@ services:
   postgres:
     image: postgres:17
     container_name: lostandfound-postgres
-    environment: 
+    environment:
       POSTGRES_DB: lostandfound
       POSTGRES_USER: lostandfound
       POSTGRES_PASSWORD: local_dev_password
@@ -11,5 +11,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # Chat storage. The API creates its indexes on start, so it must be running.
+  mongo:
+    image: mongo:8
+    container_name: lostandfound-mongo
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - mongo_data:/data/db
+
 volumes:
   postgres_data:
+  mongo_data:

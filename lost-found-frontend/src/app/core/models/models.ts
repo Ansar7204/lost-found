@@ -41,6 +41,8 @@ export interface User {
 }
 
 export interface Item {
+  /** Backend id (GUID). Missing only on the Post form preview. */
+  id?: string;
   /** Human-facing number shown as "Nº 0412". Also the URL id: /item/0412. */
   no: string;
   title: string;
@@ -52,11 +54,15 @@ export interface Item {
   /** ISO timestamp. */
   foundAt: string;
   description: string;
-  /** Data URLs of uploaded photos (demo) or storage keys (later). */
+  /** Data URLs (Post preview) or API photo URLs. */
   photos: string[];
   /** Short caption shown on the striped placeholder when there is no photo. */
   photoCaption?: string;
   finderId: string;
+  /** Finder's display name, from the API. */
+  finderName?: string;
+  /** When it was posted (ISO). */
+  createdAt?: string;
   status: ItemStatus;
   /** Set when the item is marked returned to someone. */
   ownerId?: string;

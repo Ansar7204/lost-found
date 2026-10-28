@@ -11,7 +11,7 @@ import { Photo } from '../../shared/ui/photo';
 
 type Tab = 'posted' | 'gotBack';
 
-/** "My posts" on desktop, Profile (M7) on mobile. Settings holds the demo controls. */
+/** "My posts" on desktop, Profile (M7) on mobile. Settings: sign out (+ demo controls in dev). */
 @Component({
   selector: 'app-profile',
   imports: [RouterLink, Avatar, Photo, TimeAgoPipe],
@@ -42,20 +42,29 @@ export class Profile {
     return `${people} ${people === 1 ? 'person' : 'people'} messaged`;
   }
 
-  protected switchUser(userId: string): void {
-    this.auth.switchUser(userId);
-    this.settingsOpen.set(false);
-  }
+  /** Dev mode only: sign in as another demo student. */
+  protected readonly demoLogins = ['a_seitkali@kbtu.kz', 'd_kassym@kbtu.kz'];
 
-  protected resetDemo(): void {
-    if (confirm('Reset all demo data (items, chats, alerts) to the original seed?')) {
-      this.dbStore.reset();
+  protected async switchUser(email: string): Promise<void> {
+    if (await this.auth.signInDev(email)) {
+      this.items.refresh();
+      this.settingsOpen.set(false);
     }
   }
 
-  protected signOut(): void {
-    this.auth.signOut();
-    this.router.navigate(['/signin']);
+  protected resetDemo(): void {
+    if (
+      confirm('Clear local chats and alerts in this browser? Items on the server are not affected.')
+    ) {
+      this.dbStore.reset();
+      // Keep the signed-in user's name in the fresh local directory.
+      window.location.reload();
+    }
+  }
+
+  protected async signOut(): Promise<void> {
+    await this.auth.signOut();
+    await this.router.navigate(['/signin']);
   }
 }
 

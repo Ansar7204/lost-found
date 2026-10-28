@@ -1,7 +1,8 @@
 import { LowerCasePipe } from '@angular/common';
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/auth/auth.service';
+import { AuthService, initialsOf } from '../../core/auth/auth.service';
+import { User } from '../../core/models/models';
 import { AlertsStore } from '../../core/state/alerts.store';
 import { ChatStore } from '../../core/state/chat.store';
 import { ItemsStore } from '../../core/state/items.store';
@@ -37,9 +38,23 @@ export class ItemDetail {
     return item ? placeLabel(item) : '';
   });
 
-  protected readonly finder = computed(() =>
-    this.auth.users().find((u) => u.id === this.item()?.finderId),
-  );
+  /** 'loading' until the item arrives from the API, 'missing' if it doesn't exist. */
+  protected readonly loadState = signal<'loading' | 'ready' | 'missing' | 'error'>('loading');
+
+  /** The finder: name from the API; returned count from the local directory if we have it. */
+  protected readonly finder = computed<User | undefined>(() => {
+    const item = this.item();
+    if (!item) return undefined;
+    const known = this.auth.users().find((u) => u.id === item.finderId);
+    const name = item.finderName ?? known?.name ?? 'Finder';
+    return {
+      id: item.finderId,
+      name,
+      email: known?.email ?? '',
+      initials: known?.initials ?? initialsOf(name),
+      returnedCount: known?.returnedCount ?? 0,
+    };
+  });
   protected readonly isFinder = computed(() => this.item()?.finderId === this.me()?.id);
   protected readonly isOpen = computed(() => this.item()?.status === 'open');
 
@@ -64,6 +79,18 @@ export class ItemDetail {
   protected readonly photoCount = computed(() => Math.max(1, this.item()?.photos.length ?? 0));
 
   constructor() {
+    // Load the item by its number (deep link, refresh, or not in the Browse list).
+    effect(() => {
+      const no = this.no();
+      untracked(() => {
+        this.loadState.set('loading');
+        this.itemsStore
+          .load(no)
+          .then((item) => this.loadState.set(item ? 'ready' : 'missing'))
+          .catch(() => this.loadState.set('error'));
+      });
+    });
+
     // Opening the page counts as reading the chat (only where it's visible).
     effect(() => {
       const thread = this.thread();
@@ -87,6 +114,7 @@ export class ItemDetail {
   protected send(text: string): void {
     const item = this.item();
     if (!item) return;
+    this.rememberFinder();
     const thread = this.thread() ?? this.chat.openOrCreate(item.no, item.finderId);
     this.chat.send(thread.id, text);
   }
@@ -95,16 +123,26 @@ export class ItemDetail {
   protected messageFinder(): void {
     const item = this.item();
     if (!item) return;
+    this.rememberFinder();
     const thread = this.chat.openOrCreate(item.no, item.finderId);
     this.router.navigate(['/chats', thread.id]);
   }
 
-  protected markReturned(): void {
+  /** So the (local) chat list can show the finder's name. */
+  private rememberFinder(): void {
+    const finder = this.finder();
+    if (finder && !this.isFinder()) this.auth.remember(finder);
+  }
+
+  protected async markReturned(): Promise<void> {
     const item = this.item();
     if (!item) return;
     const who = this.otherPerson()?.name ?? 'its owner';
-    if (confirm(`Mark “${item.title}” as returned to ${who}?`)) {
-      this.itemsStore.markReturned(item.no);
+    if (!confirm(`Mark “${item.title}” as returned to ${who}?`)) return;
+    try {
+      await this.itemsStore.markReturned(item.no);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Could not mark it as returned.');
     }
   }
 

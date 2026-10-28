@@ -1,6 +1,49 @@
-@LostAndFound.Api_HostAddress = http://localhost:5043
+# Sprint 1 smoke test. Works with Auth:Mode = "Dev" (appsettings.Development.json).
+@host = http://localhost:5043
+@user = a_seitkali@kbtu.kz
 
-GET {{LostAndFound.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### US-01: who am I
+GET {{host}}/api/me
+X-Dev-User: {{user}}
 
-###
+### US-01: a non-KBTU account is rejected (403)
+GET {{host}}/api/me
+X-Dev-User: someone@gmail.com
+
+### US-02: post a found item (category 2 = Electronics)
+POST {{host}}/api/items
+X-Dev-User: {{user}}
+Content-Type: application/json
+
+{
+  "name": "AirPods Pro case",
+  "description": "White, small scratch on the lid",
+  "category": 2,
+  "cabinet": "Library · 2nd floor",
+  "heldAt": "With finder",
+  "foundAt": "2026-10-27T11:30:00+05:00"
+}
+
+### US-02: a date in the future -> 400 with errors.FoundAt
+POST {{host}}/api/items
+X-Dev-User: {{user}}
+Content-Type: application/json
+
+{
+  "name": "Keys",
+  "category": 4,
+  "cabinet": "Dorms",
+  "foundAt": "2099-01-01T00:00:00Z"
+}
+
+### US-03: open Electronics items, newest first
+GET {{host}}/api/items?category=2&status=0&page=1&pageSize=20
+X-Dev-User: {{user}}
+
+### Item by its short number (Nº 0001)
+GET {{host}}/api/items/1
+X-Dev-User: {{user}}
+
+### My posts
+GET {{host}}/api/items?mine=true
+X-Dev-User: {{user}}

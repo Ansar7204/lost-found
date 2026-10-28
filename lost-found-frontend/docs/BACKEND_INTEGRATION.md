@@ -1,133 +1,98 @@
 # Backend integration
 
-The backend is an ASP.NET Core Web API: [tamirlanm/lost-found](https://github.com/tamirlanm/lost-found)
-(.NET, EF Core + PostgreSQL, Microsoft Entra ID auth). It's still being built. This page
-records what it offers today, where it and the design disagree, and how to connect the frontend.
+The backend is the ASP.NET Core Web API in this repo (`src/LostAndFound.Api`: .NET 10,
+EF Core + PostgreSQL for items, MongoDB for chat, Microsoft Entra ID auth).
 
-## What the API has today
+**Status after Sprint 1 (US-01, US-02, US-03):** sign-in, posting and browsing run on the real
+API. Chats, saved searches and notifications still run on the local `DbStore` (Sprints 2–3).
 
-All endpoints require a Microsoft Entra ID (Azure AD) bearer token with the `access_as_user`
-scope. Dev URL: `http://localhost:5043`.
-
-| Method  | Path                         | Body / query                                                 | Response                                               |
-| ------- | ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
-| `GET`   | `/api/me`                    |                                                              | `{ userId }`                                           |
-| `GET`   | `/api/items`                 | `?category&status&cabinet&page=1&pageSize=20` (max 100)      | `{ items[], totalCount, page, pageSize }`              |
-| `GET`   | `/api/items/{id}`            |                                                              | `{ id, userFoundId, name, description, cabinet, category, status, createdAt }` |
-| `POST`  | `/api/items`                 | `{ name ≤150, description ≤1024, category, cabinet ≤100, foundAt }` | `201 { id, createdAt }`; `400` if `foundAt` is in the future |
-| `PATCH` | `/api/items/{id}/returned`   |                                                              | `204`; `403` if you're not the finder                  |
-| `GET`   | `/health`                    |                                                              | health check                                           |
-
-Enums go over the wire as **numbers**:
-
-- `ItemCategory`: 0 Accessory, 1 Clothing, 2 Electronics, 3 Documents, 4 Keys, 5 Other
-- `FoundItemStatus`: 0 Open, 1 Claimed, 2 Returned
-
-The TypeScript versions of all of this are in `src/app/core/api/api.types.ts`.
-
-## Already done on the frontend
-
-- `api.types.ts`: DTOs copied 1:1 from the C# records
-- `items-api.mapper.ts`: DTO ⇄ frontend model, with the mismatches below handled in one place
-- `items-api.service.ts`: typed `HttpClient` calls for every endpoint
-- `api-error.interceptor.ts`: turns HTTP failures, including ASP.NET `ValidationProblem`
-  bodies, into an `ApiError` with field messages
-- `proxy.conf.json`: `ng serve` forwards `/api/*` to `http://localhost:5043`, so no CORS setup
-  is needed in development
-- Tests for the mapper and service (`*.spec.ts`), run without a backend
-
-## Questions to settle with the backend
-
-These are differences between the design handoff and the API. Worth one short call.
-
-| #   | Topic              | Design wants                                                   | API has                                   | Suggestion                                                                                           |
-| --- | ------------------ | -------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 1   | Categories         | Electronics, Cards & IDs, Keys, Clothing, Bottles, Books & notes, Other | Accessory, Clothing, Electronics, Documents, Keys, Other | Agree on one list. Mapper currently sends Bottles→Accessory, Books & notes→Other            |
-| 2   | Enum format        | readable values                                                | numbers                                   | Add `JsonStringEnumConverter` in `Program.cs` so JSON says `"Keys"`, not `4`                           |
-| 3   | Location           | place from a list + detail ("Library · 2nd floor") **and** where it's held now | one `cabinet` string        | Split into `place`, `placeDetail`, `heldAt`. Until then the mapper joins place + detail into `cabinet` |
-| 4   | Item number        | short `Nº 0412`                                                | GUID                                      | Add a sequential `number` column, or keep GUIDs and show the first 4 chars (current mapper)           |
-| 5   | Detail fields      | `foundAt`, photos, finder name                                 | `GetById` has no `foundAt` / `photoKey`; no user names | Return `foundAt`, `photoUrl`, `finder: { id, name }`                                          |
-| 6   | List fields        | photo, `foundAt` for "2H AGO"                                  | list returns `createdAt` only             | Add `foundAt` and `photoUrl` to `SearchFoundItemResponse`                                            |
-| 7   | Search             | text search, several places, time range, sort                  | category, status, exact cabinet           | Add `q`, `places[]`, `foundAfter`, `sort`                                                            |
-| 8   | Photos             | upload up to 3                                                 | `PhotoKey` column, no upload endpoint     | `POST /api/items/{id}/photos` (multipart) → blob storage                                             |
-| 9   | Claimed state      | open / returned only                                           | Open / Claimed / Returned                 | Decide what "Claimed" means in the UI (e.g. "Owner found · meeting")                                 |
-| 10  | Returned to whom   | owner moves to "Got back"                                      | `MarkReturned` doesn't record the owner   | Take `{ ownerUserId }` in the PATCH body                                                              |
-| 11  | Saved searches, notifications, chat | core of the design                           | not in the API yet                        | New endpoints; chat could use SignalR                                                                 |
-| 12  | Sign-in            | `@kbtu.kz` email + 6-digit code                                | Entra ID tokens                           | If KBTU accounts are in Entra ID, use MSAL and drop the OTP screen                                     |
-| 13  | CORS / HTTPS       |                                                                | no CORS policy; `UseHttpsRedirection`     | Dev: proxy (done). Prod: serve from the same domain or add a CORS policy for the frontend origin      |
-
-## How to connect (step by step)
-
-### 1. Run the backend
+## Run everything locally
 
 ```bash
-git clone https://github.com/tamirlanm/lost-found && cd lost-found
-docker compose up -d                  # PostgreSQL on 127.0.0.1:5433
-# add ConnectionStrings:Postgres and the AzureAd section to appsettings.Development.json
-dotnet ef database update --project src/LostAndFound.Api
+docker compose up -d                                              # Postgres :5433, Mongo :27018
 dotnet run --project src/LostAndFound.Api --launch-profile http   # http://localhost:5043
+cd lost-found-frontend && npm start                               # http://localhost:4200
 ```
 
-Then `npm start` here: requests to `/api/...` are proxied to it.
+- In Development the API applies EF migrations on start (`Database:MigrateOnStartup`, default
+  `true`), so there is no separate `dotnet ef database update` step.
+- `ng serve` proxies `/api/*` to `http://localhost:5043` (`proxy.conf.json`), so no CORS setup.
+- `src/LostAndFound.Api/LostAndFound.Api.http` has ready-made requests for every Sprint 1 endpoint.
 
-### 2. Sign-in with Microsoft Entra ID (MSAL)
+## Sign-in (US-01)
 
-The API rejects requests without a token. The standard Angular way:
+Two modes. The frontend (`environment*.ts → auth.mode`) and the API (`Auth:Mode`) must match.
 
-```bash
-npm install @azure/msal-browser @azure/msal-angular
-```
+| Mode                   | Frontend | API (`appsettings.*.json`)                        | How it works                                                                                                                             |
+| ---------------------- | -------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Dev (default locally)  | `'dev'`  | `"Auth": { "Mode": "Dev" }`                       | Type any `@kbtu.kz` login; requests carry `X-Dev-User: <email>`. **Development only** — the API refuses to start in this mode elsewhere. |
+| Microsoft (production) | `'msal'` | `"Auth": { "Mode": "Entra" }` (or no `Auth:Mode`) | "Sign in with Microsoft" (MSAL redirect); requests carry `Authorization: Bearer <token>` with the `access_as_user` scope.                |
 
-- Register a **single-page application** in Entra ID with redirect URI `http://localhost:4200`.
-- In `app.config.ts`, provide MSAL (`MsalService`, `MsalGuard`, `MsalInterceptor`) with the
-  tenant and client id, and a protected resource map:
-  `['/api/', ['api://<backend-client-id>/access_as_user']]`.
-- The `MsalInterceptor` then attaches `Authorization: Bearer ...` to every `/api` request,
-  the same way `apiErrorInterceptor` already sits in the HTTP pipeline.
-- Replace the body of `AuthService` with MSAL calls; keep its public signals
-  (`currentUser`, `isSignedIn`) so no component has to change.
-- Replace `authGuard` with `MsalGuard` (or keep ours and make it check MSAL).
+In both modes the API only accepts accounts whose email ends with `Auth:AllowedEmailDomain`
+(`kbtu.kz`); others get `403`, and the sign-in page says so. In production set it through the
+environment: `Auth__AllowedEmailDomain=kbtu.kz` (plus `AzureAd__TenantId`, `AzureAd__ClientId`,
+`ConnectionStrings__Postgres`, `MongoDb__*`), since `appsettings.json` is not in git.
 
-### 3. Switch items to the API
+The user always comes from `GET /api/me` (`{ userId, name, email }`), so the frontend and the
+backend agree on ids. After sign-in the user lands on the page they first asked for
+(`authGuard` → `/signin?next=…` → MSAL `state` / router).
 
-Only `ItemsStore` needs to change; components keep calling the same methods.
-A sketch using `rxResource` (loading and error states for free):
+### Entra ID checklist for the `msal` mode
 
-```ts
-@Injectable({ providedIn: 'root' })
-export class ItemsStore {
-  private readonly api = inject(ItemsApiService);
-  private readonly refresh = signal(0);
+The app registration `51c93c36-…` (tenant `57081b5e-…`) is used for both the API and the SPA:
 
-  private readonly page = rxResource({
-    params: () => ({ n: this.refresh() }),
-    stream: () => this.api.search({ status: ApiFoundItemStatus.Open, pageSize: 100 }),
-  });
+1. Azure portal → App registrations → the app → **Authentication** → add platform
+   **Single-page application** with redirect URIs `http://localhost:4200` and the production URL.
+2. **Expose an API** → Application ID URI `api://51c93c36-83bc-464e-8229-2d739b278dc7`, scope
+   `access_as_user` (the API already requires it).
+3. **API permissions** → add _My APIs → access_as_user_ and grant consent.
+4. To let KBTU students in, the registration must accept their accounts: either it lives in the
+   KBTU tenant, or it is multi-tenant ("Accounts in any organizational directory") — then set
+   `tenantId: 'organizations'` in `environment.ts` and `AzureAd:TenantId` = `organizations` in the API.
 
-  readonly items = computed(() => this.page.value()?.items ?? []);
-  readonly isLoading = this.page.isLoading;
-  readonly error = this.page.error;
+## API (Sprint 1)
 
-  async post(draft: ItemDraft): Promise<string> {
-    const { id } = await firstValueFrom(this.api.create(draft));
-    this.refresh.update((n) => n + 1);
-    return id;
-  }
-}
-```
+All endpoints need auth (see above). Enums go over the wire as **numbers**.
 
-Things that change because the calls become asynchronous:
+| Method  | Path                       | Body / query                                                                      | Response                                                                           |
+| ------- | -------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `GET`   | `/api/me`                  |                                                                                   | `{ userId, name, email }`; `403` if not KBTU                                       |
+| `GET`   | `/api/items`               | `?category&status&cabinet&mine&page=1&pageSize=20` (max 100), newest first        | `{ items: FoundItemDto[], totalCount, page, pageSize }`                            |
+| `GET`   | `/api/items/{id:guid}`     |                                                                                   | `FoundItemDto`                                                                     |
+| `GET`   | `/api/items/{number:int}`  | the short Nº from the URL, `/api/items/413`                                       | `FoundItemDto`                                                                     |
+| `POST`  | `/api/items`               | `{ name ≤150, description? ≤1024, category, cabinet ≤100, heldAt? ≤50, foundAt }` | `201 FoundItemDto`; `400` ValidationProblem (`FoundAt` in the future, empty name…) |
+| `POST`  | `/api/items/{id}/photo`    | multipart `photo` (JPEG/PNG ≤ 5 MB, one per item)                                 | `{ photoUrl }`                                                                     |
+| `GET`   | `/api/items/{id}/photo`    |                                                                                   | image (needs auth → `<app-photo>` fetches it as a blob)                            |
+| `PATCH` | `/api/items/{id}/returned` |                                                                                   | `204`; `403` if you're not the finder                                              |
+| `GET`   | `/health`                  |                                                                                   | health check                                                                       |
 
-- `post()` and `markReturned()` return Promises: `await` them in the component and show a
-  busy state on the button.
-- Show `ApiError.fieldErrors` next to the matching form fields (the keys are the C# property
-  names, e.g. `FoundAt`).
-- Routes use GUIDs: `/item/:id` instead of `/item/:no`.
-- Saved searches, notifications and chat keep running on the local `DbStore` until the API
-  has endpoints for them. The stores are separate for exactly this reason.
+`FoundItemDto`: `{ id, number, userFoundId, finderName, name, description, category, cabinet,
+heldAt, status, foundAt, createdAt, photoUrl }`.
 
-### 4. Generate types instead of copying them (optional)
+- `ItemCategory`: 0 Accessory (legacy → "Other"), 1 Clothing, 2 Electronics, 3 Documents
+  ("Cards & IDs"), 4 Keys, 5 Other, 6 Bottles, 7 BooksAndNotes ("Books & notes")
+- `FoundItemStatus`: 0 Open, 1 Claimed (shown as open), 2 Returned
 
-The API exposes OpenAPI at `/openapi/v1.json` in development. Tools like `openapi-typescript`
-can generate `api.types.ts` from it, so the frontend fails to compile when the contract
-changes, instead of failing at runtime.
+Migration `20261027120000_Sprint1ItemFields` adds `Number` (identity, unique), `FinderName`,
+`HeldAt` and widens `Name` to 150.
+
+## Frontend pieces
+
+- `core/api/api.types.ts` — DTOs 1:1 with the C# records
+- `core/api/items-api.mapper.ts` — DTO ⇄ model (`number 413` → `no '0413'`, `cabinet` ⇄ place + detail)
+- `core/api/items-api.service.ts` — typed `HttpClient` calls
+- `core/auth/auth.service.ts`, `msal-client.ts`, `auth.interceptor.ts` — sign-in, credentials on
+  every `/api` request, `401` → back to sign-in
+- `core/state/items.store.ts` — Browse list, my posts, detail cache; `post()` / `markReturned()`
+  are async and throw `ApiError` (field errors are shown on the Post form)
+
+## Still open (next sprints)
+
+| Topic                             | Now                                                                      | Plan                                                          |
+| --------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| Search (US-04)                    | text / places / time filtered in the browser on the first 100 open items | `q`, `places[]`, `foundAfter`, paging on the server           |
+| Chat (US-06)                      | local `DbStore`                                                          | `/api/conversations` (MongoDB) exists, wire `ChatStore` to it |
+| Returned to whom (US-07/10)       | `PATCH` doesn't record the owner; "Got back" is empty                    | take the owner from the conversation                          |
+| Saved searches, alerts (US-08/09) | local `DbStore`                                                          | new endpoints                                                 |
+| Photos (US-11)                    | 1 photo per item                                                         | up to 3                                                       |
+| Production CORS / domain          | same domain assumed                                                      | add a CORS policy if the SPA moves to another origin          |

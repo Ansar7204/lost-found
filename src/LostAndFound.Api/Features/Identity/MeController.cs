@@ -1,11 +1,10 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
-using Microsoft.Identity.Web;
 
 namespace LostAndFound.Api.Features.Identity;
 
+/// <summary>US-01: who am I? The frontend calls this right after sign-in.</summary>
 [ApiController]
 [Route("api/me")]
 [Authorize]
@@ -13,14 +12,16 @@ namespace LostAndFound.Api.Features.Identity;
 public sealed class MeController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get()
+    public ActionResult<MeResponse> Get()
     {
-        var userId = User.GetObjectId();
+        var userId = User.GetUserId();
         if (userId is null)
         {
             return Unauthorized();
         }
 
-        return Ok(new {userId});
+        return Ok(new MeResponse(userId.Value, User.GetDisplayName(), User.GetEmail()));
     }
 }
+
+public sealed record MeResponse(Guid UserId, string Name, string Email);

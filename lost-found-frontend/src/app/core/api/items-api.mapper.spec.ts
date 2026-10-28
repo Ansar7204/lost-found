@@ -1,27 +1,37 @@
+import { apiItem } from '../../../testing/api-fakes';
 import { ApiFoundItemStatus, ApiItemCategory } from './api.types';
-import { itemFromDetails, shortNo, splitCabinet, toCreateRequest } from './items-api.mapper';
+import { formatNo, itemFromApi, splitCabinet, toCreateRequest } from './items-api.mapper';
 
 describe('items-api.mapper', () => {
   it('maps a backend item to the frontend model', () => {
-    const item = itemFromDetails({
-      id: '3f2a9c1e-0000-4000-8000-000000000000',
-      userFoundId: 'user-guid',
-      name: 'Student ID',
-      description: 'Blue lanyard',
-      cabinet: 'Main building · Room 304',
-      category: ApiItemCategory.Documents,
-      status: ApiFoundItemStatus.Claimed,
-      createdAt: '2026-09-30T10:00:00Z',
-    });
+    const item = itemFromApi(
+      apiItem({
+        id: '3f2a9c1e-0000-4000-8000-000000000000',
+        number: 412,
+        userFoundId: 'user-guid',
+        finderName: 'Daniyar K.',
+        name: 'Student ID',
+        description: 'Blue lanyard',
+        cabinet: 'Main building · Room 304',
+        heldAt: 'Security desk',
+        category: ApiItemCategory.Documents,
+        status: ApiFoundItemStatus.Claimed,
+        photoUrl: '/api/items/3f2a/photo',
+      }),
+    );
 
     expect(item).toMatchObject({
-      no: '3F2A',
+      id: '3f2a9c1e-0000-4000-8000-000000000000',
+      no: '0412',
       title: 'Student ID',
       category: 'Cards & IDs',
       place: 'Main building',
       placeDetail: 'Room 304',
+      held: 'Security desk',
       status: 'open', // Claimed has no UI state yet
       finderId: 'user-guid',
+      finderName: 'Daniyar K.',
+      photos: ['/api/items/3f2a/photo'],
     });
   });
 
@@ -29,17 +39,19 @@ describe('items-api.mapper', () => {
     const request = toCreateRequest({
       title: '  Keys  ',
       description: 'Red lanyard ',
-      category: 'Keys',
+      category: 'Books & notes',
       place: 'Dorms',
       placeDetail: 'Block B',
+      held: 'Library desk',
       foundAt: '2026-09-30T10:00:00.000Z',
     });
 
     expect(request).toEqual({
       name: 'Keys',
       description: 'Red lanyard',
-      category: ApiItemCategory.Keys,
+      category: ApiItemCategory.BooksAndNotes,
       cabinet: 'Dorms · Block B',
+      heldAt: 'Library desk',
       foundAt: '2026-09-30T10:00:00.000Z',
     });
   });
@@ -49,7 +61,8 @@ describe('items-api.mapper', () => {
     expect(splitCabinet('library')).toEqual({ place: 'Library' });
   });
 
-  it('makes a short Nº from a GUID', () => {
-    expect(shortNo('ab12cd34-0000')).toBe('AB12');
+  it('formats the short Nº', () => {
+    expect(formatNo(7)).toBe('0007');
+    expect(formatNo(12345)).toBe('12345');
   });
 });

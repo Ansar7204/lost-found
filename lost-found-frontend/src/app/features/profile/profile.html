@@ -17,29 +17,32 @@
 
   @if (settingsOpen()) {
     <section class="settings" aria-label="Settings">
-      <p class="label">Demo · switch user</p>
-      <p class="hint">
-        Post as one student, get the alert as another. Tip: open a second tab and sign in as the
-        other user; both tabs update live.
-      </p>
-      <div class="users">
-        @for (u of auth.users(); track u.id) {
-          <button
-            type="button"
-            class="user"
-            [class.active]="u.id === me.id"
-            [disabled]="u.id === me.id"
-            (click)="switchUser(u.id)"
-          >
-            <app-avatar [initials]="u.initials" [size]="24" />
-            {{ u.name }}
+      @if (auth.mode === 'dev') {
+        <p class="label">Demo · switch user</p>
+        <p class="hint">
+          Post as one student, look for it as another. Tip: open a second tab and sign in as the
+          other user.
+        </p>
+        <div class="users">
+          @for (email of demoLogins; track email) {
+            <button
+              type="button"
+              class="user"
+              [class.active]="email === me.email"
+              [disabled]="email === me.email"
+              (click)="switchUser(email)"
+            >
+              {{ email }}
+            </button>
+          }
+        </div>
+      }
+      <div class="actions">
+        @if (auth.mode === 'dev') {
+          <button type="button" class="btn btn--secondary" (click)="resetDemo()">
+            Reset local chats &amp; alerts
           </button>
         }
-      </div>
-      <div class="actions">
-        <button type="button" class="btn btn--secondary" (click)="resetDemo()">
-          Reset demo data
-        </button>
         <button type="button" class="btn btn--secondary" (click)="signOut()">Sign out</button>
       </div>
     </section>
@@ -66,6 +69,9 @@
     </button>
   </nav>
 
+  @if (tab() === 'posted' && items.myPostsLoading()) {
+    <p class="loading">Loading your posts…</p>
+  }
   <ul class="list" role="tabpanel">
     @for (item of list(); track item.no) {
       <li>

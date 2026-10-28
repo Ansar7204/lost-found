@@ -120,6 +120,18 @@ export class Browse {
 
   protected readonly isSaved = computed(() => !!this.alerts.findSaved(this.filter()));
 
+  // ---- Server state (US-03) ----
+  protected readonly loading = this.itemsStore.loading;
+  protected readonly error = this.itemsStore.error;
+  /** First load: show the skeleton instead of "No matches". */
+  protected readonly firstLoad = computed(
+    () => this.loading() && this.itemsStore.openItems().length === 0,
+  );
+
+  protected retry(): void {
+    this.itemsStore.refresh();
+  }
+
   // ---- Actions: they only change the URL; the inputs above do the rest ----
   protected setCategory(category: CategoryFilter): void {
     this.setParams({ cat: category === 'All' ? null : category });

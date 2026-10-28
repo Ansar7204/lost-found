@@ -1,4 +1,8 @@
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { ApiError } from '../api/api-error.interceptor';
+import { ApiFoundItemStatus } from '../api/api.types';
+import { ItemsApiService } from '../api/items-api.service';
 import { AuthService } from '../auth/auth.service';
 import { DbStore } from '../data/db.store';
 import { AppNotification, Category, Db, Item, Place } from '../models/models';
@@ -11,7 +15,7 @@ import {
   searchToFilter,
 } from '../util/matching';
 
-/** What the Post form produces. The store fills in number, finder, status. */
+/** What the Post form produces. The API fills in number, finder, status. */
 export interface ItemDraft {
   title: string;
   category: Category;
@@ -23,37 +27,88 @@ export interface ItemDraft {
   photos: string[];
 }
 
+/** Enough for Browse in the MVP. Server-side filters + paging come with US-04. */
+const BROWSE_PAGE_SIZE = 100;
+
 /**
  * Items feature store: the one place that knows how items are read and changed.
- * Components inject this, never DbStore directly.
+ * Components inject this; it talks to the API through ItemsApiService.
+ *
+ * Saved-search matches, chats and notifications still live in the local DbStore
+ * until their APIs exist (Sprints 2–3), so post() and markReturned() also update those.
  */
 @Injectable({ providedIn: 'root' })
 export class ItemsStore {
+  private readonly api = inject(ItemsApiService);
   private readonly dbStore = inject(DbStore);
   private readonly auth = inject(AuthService);
 
-  readonly items = computed(() => this.dbStore.db().items);
-  readonly openItems = computed(() => this.items().filter((i) => i.status === 'open'));
+  // ---- Server state ----
+  private readonly openList = signal<Item[]>([]);
+  private readonly myList = signal<Item[]>([]);
+  /** Items opened by number that aren't in the lists (e.g. returned, or a shared link). */
+  private readonly extra = signal<Item[]>([]);
+
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly myPostsLoading = signal(false);
+
+  /** Every item we know, newest data wins, no duplicates. */
+  readonly items = computed(() => {
+    const byNo = new Map<string, Item>();
+    for (const list of [this.extra(), this.myList(), this.openList()]) {
+      for (const item of list) byNo.set(item.no, item);
+    }
+    return [...byNo.values()];
+  });
+
+  /** Browse (US-03): open items, newest first (the API already sorts them). */
+  readonly openItems = computed(() => this.openList().filter((i) => i.status === 'open'));
+
+  /** Shown on the Post preview. The API assigns the real one. */
   readonly nextNo = computed(() => nextItemNo(this.items()));
 
   /** Items the current user posted. */
-  readonly myPosts = computed(() => {
-    const me = this.auth.currentUser()?.id;
-    return this.items()
-      .filter((i) => i.finderId === me)
-      .sort(byNewest);
-  });
+  readonly myPosts = computed(() => [...this.myList()].sort(byNewest));
 
-  /** Items that were returned to the current user. */
-  readonly gotBack = computed(() => {
-    const me = this.auth.currentUser()?.id;
-    return this.items()
-      .filter((i) => i.status === 'returned' && i.ownerId === me)
-      .sort(byNewest);
-  });
+  /**
+   * Items that were returned to the current user. The API doesn't record the owner yet
+   * (US-07/US-10, Sprints 2–3), so this stays empty for now.
+   */
+  readonly gotBack = computed<Item[]>(() => []);
+
+  constructor() {
+    // (Re)load whenever the signed-in user changes.
+    effect(() => {
+      const userId = this.auth.currentUser()?.id;
+      untracked(() => (userId ? this.refresh() : this.clear()));
+    });
+  }
+
+  /** Reload Browse and "Posted by me" from the API. */
+  refresh(): void {
+    void this.loadOpen();
+    void this.loadMine();
+  }
 
   byNo(no: string): Item | undefined {
     return this.items().find((i) => i.no === no);
+  }
+
+  /** Make sure item Nº `no` is loaded (detail page). Resolves to undefined if it doesn't exist. */
+  async load(no: string): Promise<Item | undefined> {
+    const known = this.byNo(no);
+    if (known) return known;
+    if (!/^\d+$/.test(no)) return undefined;
+
+    try {
+      const item = await firstValueFrom(this.api.getByNo(no));
+      this.extra.update((list) => [item, ...list.filter((i) => i.no !== item.no)]);
+      return item;
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return undefined;
+      throw error;
+    }
   }
 
   /** How many other people's saved searches this draft would notify. */
@@ -67,37 +122,72 @@ export class ItemsStore {
   }
 
   /**
-   * Post a found item, then notify every matching saved search.
-   * One `update()` = one atomic change, like a DB transaction on the server.
+   * US-02: post a found item. Throws ApiError (with fieldErrors on 400).
+   * The new item goes to the top of Browse right away.
    */
-  post(draft: ItemDraft): Item {
-    const me = this.requireUser();
-    const item: Item = {
-      ...draft,
-      no: this.nextNo(),
-      finderId: me.id,
-      status: 'open',
-      photoCaption: draft.title.toLowerCase().slice(0, 24),
-    };
+  async post(draft: ItemDraft): Promise<Item> {
+    let item = await firstValueFrom(this.api.create(draft));
 
-    this.dbStore.update((db) => notifyMatches({ ...db, items: [item, ...db.items] }, item));
+    // One photo per item in the API for now (US-11 adds up to 3).
+    // The item is already posted, so a failed upload must not fail the post.
+    const [firstPhoto] = draft.photos;
+    if (firstPhoto && item.id) {
+      try {
+        const blob = await (await fetch(firstPhoto)).blob();
+        const { photoUrl } = await firstValueFrom(this.api.uploadPhoto(item.id, blob));
+        item = { ...item, photos: [photoUrl] };
+      } catch {
+        /* keep the item without a photo */
+      }
+    }
+
+    this.openList.update((list) => [item, ...list.filter((i) => i.no !== item.no)]);
+    this.myList.update((list) => [item, ...list.filter((i) => i.no !== item.no)]);
+    this.dbStore.update((db) => notifyMatches(db, item));
     return item;
   }
 
-  /** Finder only. Closes the item and tells the owner. */
-  markReturned(no: string): void {
+  /** Finder only (the API answers 403 otherwise). Closes the item and tells the owner. */
+  async markReturned(no: string): Promise<void> {
     const me = this.requireUser();
+    const item = this.byNo(no);
+    if (!item?.id || item.finderId !== me.id || item.status === 'returned') return;
+
+    await firstValueFrom(this.api.markReturned(item.id));
+
     const now = new Date().toISOString();
+    const thread = this.dbStore.db().threads.find((t) => t.itemNo === no);
+    const ownerId = thread?.participants.find((p) => p !== me.id);
+    const returned: Item = { ...item, status: 'returned', ownerId, returnedAt: now };
+    const replace = (list: Item[]) => list.map((i) => (i.no === no ? returned : i));
 
-    this.dbStore.update((db) => {
-      const item = db.items.find((i) => i.no === no);
-      if (!item || item.finderId !== me.id || item.status === 'returned') return db;
+    this.openList.update((list) => list.filter((i) => i.no !== no));
+    this.myList.update(replace);
+    this.extra.update(replace);
 
-      // The owner is whoever the finder was chatting with about this item.
-      const thread = db.threads.find((t) => t.itemNo === no);
-      const ownerId = thread?.participants.find((p) => p !== me.id);
-
-      const notifications: AppNotification[] = ownerId
+    // Local parts (chat system line, owner notification) until the chat API is wired up.
+    this.dbStore.update((db) => ({
+      ...db,
+      users: db.users.map((u) =>
+        u.id === me.id ? { ...u, returnedCount: u.returnedCount + 1 } : u,
+      ),
+      threads: db.threads.map((t) =>
+        t.itemNo === no
+          ? {
+              ...t,
+              messages: [
+                ...t.messages,
+                {
+                  from: me.id,
+                  text: `${me.name} marked this item as returned`,
+                  at: now,
+                  system: true,
+                },
+              ],
+            }
+          : t,
+      ),
+      notifications: ownerId
         ? [
             {
               id: newId('n'),
@@ -108,36 +198,46 @@ export class ItemsStore {
               read: false,
               link: `/item/${item.no}`,
             },
+            ...db.notifications,
           ]
-        : [];
+        : db.notifications,
+    }));
+  }
 
-      return {
-        ...db,
-        items: db.items.map((i) =>
-          i.no === no ? { ...i, status: 'returned', ownerId, returnedAt: now } : i,
-        ),
-        users: db.users.map((u) =>
-          u.id === me.id ? { ...u, returnedCount: u.returnedCount + 1 } : u,
-        ),
-        threads: db.threads.map((t) =>
-          t.itemNo === no
-            ? {
-                ...t,
-                messages: [
-                  ...t.messages,
-                  {
-                    from: me.id,
-                    text: `${me.name} marked this item as returned`,
-                    at: now,
-                    system: true,
-                  },
-                ],
-              }
-            : t,
-        ),
-        notifications: [...notifications, ...db.notifications],
-      };
-    });
+  private async loadOpen(): Promise<void> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const page = await firstValueFrom(
+        this.api.search({ status: ApiFoundItemStatus.Open, pageSize: BROWSE_PAGE_SIZE }),
+      );
+      this.openList.set(page.items);
+    } catch (error) {
+      this.error.set(error instanceof Error ? error.message : 'Could not load items.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  private async loadMine(): Promise<void> {
+    this.myPostsLoading.set(true);
+    try {
+      const page = await firstValueFrom(
+        this.api.search({ mine: true, pageSize: BROWSE_PAGE_SIZE }),
+      );
+      this.myList.set(page.items);
+    } catch {
+      /* Browse shows the error; the profile just stays empty */
+    } finally {
+      this.myPostsLoading.set(false);
+    }
+  }
+
+  private clear(): void {
+    this.openList.set([]);
+    this.myList.set([]);
+    this.extra.set([]);
+    this.error.set(null);
   }
 
   private requireUser() {
@@ -148,7 +248,7 @@ export class ItemsStore {
 }
 
 function byNewest(a: Item, b: Item): number {
-  return b.foundAt.localeCompare(a.foundAt);
+  return (b.createdAt ?? b.foundAt).localeCompare(a.createdAt ?? a.foundAt);
 }
 
 /** For each saved search (of someone else) that matches, bump its counter and notify. */

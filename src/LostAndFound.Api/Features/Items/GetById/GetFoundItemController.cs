@@ -13,37 +13,27 @@ namespace LostAndFound.Api.Features.Items.GetById;
 public sealed class GetFoundItemController(AppDbContext db) : ControllerBase
 {
     [HttpGet("{id:guid}")]
+    [ProducesResponseType<FoundItemDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
-        var item = await db.FoundItems.AsNoTracking().Where(x => x.Id == id).Select(x => new GetFoundItemResponse(
-            x.Id, 
-            x.UserFoundId,
-            x.Name, 
-            x.Description,
-            x.Cabinet,
-            x.Category,
-            x.Status,
-            x.CreatedAt,
-            x.PhotoKey == null ? null : "/api/items/" + x.Id + "/photo"
-        )).SingleOrDefaultAsync(cancellationToken);
+        var item = await db.FoundItems.AsNoTracking()
+            .Where(x => x.Id == id)
+            .Select(FoundItemDto.Projection)
+            .SingleOrDefaultAsync(cancellationToken);
 
-        if(item is null)
-        {
-            return NotFound();
-        }
+        return item is null ? NotFound() : Ok(item);
+    }
 
-        return Ok(item);
+    /// <summary>The UI links items by their short number: /item/0413.</summary>
+    [HttpGet("{number:int}")]
+    [ProducesResponseType<FoundItemDto>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByNumber(int number, CancellationToken cancellationToken)
+    {
+        var item = await db.FoundItems.AsNoTracking()
+            .Where(x => x.Number == number)
+            .Select(FoundItemDto.Projection)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return item is null ? NotFound() : Ok(item);
     }
 }
-
-public sealed record GetFoundItemResponse(
-    Guid Id,
-    Guid UserFoundId,
-    string Name,
-    string Description,
-    string Cabinet,
-    ItemCategory Category,
-    FoundItemStatus Status,
-    DateTimeOffset CreatedAt,
-    string? PhotoUrl
-);
