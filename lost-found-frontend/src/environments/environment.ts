@@ -10,7 +10,7 @@ export const environment: AppEnvironment = {
     /** Real Microsoft Entra ID sign-in with the KBTU account (US-01). */
     mode: 'msal',
     msal: {
-      clientId: '51c93c36-83bc-464e-8229-2d739b278dc7',
+      clientId: '8cdb292b-4135-48b3-b7cb-04d0c96e9224',
       tenantId: '57081b5e-e66a-4993-8eaf-15b0b309293f',
       apiScope: 'api://51c93c36-83bc-464e-8229-2d739b278dc7/access_as_user',
     },
